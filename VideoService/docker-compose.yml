@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"   # API port
+      - "9001:9001"   # Web UI
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+  video_ms:
+    image: video_ms:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: video-ms-container
+    ports:
+      - "8080:8080"
+    depends_on:
+      - minio
+#      - eureka-server
+#      - config-server
+#    networks:
+#      - my_network
+
+
+volumes:
+  minio_data:
+
+
