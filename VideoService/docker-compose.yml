@@ -13,24 +13,32 @@ services:
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
+    networks:
+      - minio-network
 
-  video_ms:
-    image: video_ms:latest
+  video-ms:
+    image: video-ms:latest
     build:
       context: .
       dockerfile: Dockerfile
     container_name: video-ms-container
     ports:
       - "8080:8080"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+      MINIO_ENDPOINT: http://minio:9000
     depends_on:
       - minio
-#      - eureka-server
-#      - config-server
-#    networks:
-#      - my_network
+    networks:
+      - minio-network
 
 
 volumes:
   minio_data:
+
+networks:
+  minio-network:
+    driver: bridge
 
 
