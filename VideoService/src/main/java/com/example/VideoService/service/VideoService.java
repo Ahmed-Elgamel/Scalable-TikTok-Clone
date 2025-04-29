@@ -1,8 +1,11 @@
 package com.example.VideoService.service;
 
+import com.example.VideoService.dto.VideoDTO;
+import com.example.VideoService.model.VideoMetaData;
+import com.example.VideoService.repository.VideoMetaDataRepository;
 import io.minio.MinioClient;
 import io.minio.errors.MinioException;
-import io.minio.messages.Bucket;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +17,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -21,18 +25,23 @@ public class VideoService {
 
     private final S3Client s3Client;  // For S3
     private final MinioClient minioClient;  // For MinIO
+    @Autowired
+    private final VideoMetaDataRepository videoMetaDataRepository;
 
     @Value("${minio.bucket}")
     private String bucketName;
 
-    public VideoService(S3Client s3Client, MinioClient minioClient) {
+    public VideoService(S3Client s3Client, MinioClient minioClient, VideoMetaDataRepository videoMetaDataRepository) {
+        this.videoMetaDataRepository = videoMetaDataRepository;
         this.s3Client = null;
         this.minioClient = minioClient;
     }
 
     // Upload to S3 or MinIO
-    public String uploadVideo(MultipartFile file) throws IOException, MinioException, NoSuchAlgorithmException, InvalidKeyException {
-        String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+    public String uploadVideo(VideoDTO videoDTO, MultipartFile file) throws IOException, MinioException, NoSuchAlgorithmException, InvalidKeyException {
+        String videoId = UUID.randomUUID().toString();
+        String filename = "videos/" + videoId + "_" + file.getOriginalFilename();
+
 
         if (s3Client != null) {
             PutObjectRequest request = PutObjectRequest.builder()
@@ -52,9 +61,24 @@ public class VideoService {
                             .contentType(file.getContentType())
                             .stream(file.getInputStream(), file.getSize(), -1)
                             .build());
+
+
+            String userId = videoDTO.getUserId(); //todo: send to user service?
+
+            // Save metadata to DB
+            VideoMetaData videoMetaData = new VideoMetaData();
+            videoMetaData.setVideoId(videoId);
+            videoMetaData.setDurationSeconds(0);  //todo  note: this needs an external library like FFMPEG for example
+            videoMetaData.setSizeBytes(file.getSize());
+            videoMetaData.setCaption(videoDTO.getCaption());
+            videoMetaData.setProcessedAt(LocalDateTime.now());
+            videoMetaDataRepository.save(videoMetaData);
+
+
+
         }
 
-        return filename;
+        return videoId;
     }
 
     public byte[] downloadVideo(String filename) throws MinioException, IOException, NoSuchAlgorithmException, InvalidKeyException {

@@ -1,5 +1,7 @@
 package com.example.VideoService.controller;
 
+import com.example.VideoService.dto.VideoDTO;
+
 import com.example.VideoService.service.VideoService;
 import io.minio.errors.MinioException;
 import org.springframework.http.HttpHeaders;
@@ -22,11 +24,14 @@ public class VideoController {
         this.videoService = videoService;
     }
 
+
+
     @PostMapping("/upload")
-    public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file) throws IOException, MinioException, NoSuchAlgorithmException, InvalidKeyException {
-        System.out.println("nalbalbabalbalbalbalbalbalbalbalablablablabalblbalbalbalbalbalablbalblablabalb");
-        String fileName = videoService.uploadVideo(file);
-        return ResponseEntity.ok("Uploaded as: " + fileName);
+    public ResponseEntity<String> upload(
+            @RequestPart("file") MultipartFile file,
+            @RequestPart("metadata") VideoDTO metadata) throws IOException, MinioException, NoSuchAlgorithmException, InvalidKeyException {
+        String videoId = videoService.uploadVideo(metadata, file);
+        return ResponseEntity.ok("Uploaded Video with id: " + videoId);
     }
 
     @GetMapping("/download/{filename}")
