@@ -39,8 +39,8 @@ public class VideoService {
 
     // Upload to S3 or MinIO
     public String uploadVideo(VideoDTO videoDTO, MultipartFile file) throws IOException, MinioException, NoSuchAlgorithmException, InvalidKeyException {
-        String videoId = UUID.randomUUID().toString();
-        String filename = "videos/" + videoId + "_" + file.getOriginalFilename();
+        String videoId = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        String filename = "videos/" + videoId ;
 
 
         if (s3Client != null) {
@@ -81,13 +81,13 @@ public class VideoService {
         return videoId;
     }
 
-    public byte[] downloadVideo(String filename) throws MinioException, IOException, NoSuchAlgorithmException, InvalidKeyException {
+    public byte[] downloadVideo(String videoId) throws MinioException, IOException, NoSuchAlgorithmException, InvalidKeyException {
         byte[] fileBytes = null;
 
         if (s3Client != null) {
             GetObjectRequest request = GetObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(filename)
+                    .key(videoId)
                     .build();
 
             fileBytes = s3Client.getObjectAsBytes(request).asByteArray();
@@ -97,7 +97,7 @@ public class VideoService {
             fileBytes = minioClient.getObject(
                             io.minio.GetObjectArgs.builder()
                                     .bucket(bucketName)
-                                    .object(filename)
+                                    .object("videos/" + videoId + ".mp4")
                                     .build())
                     .readAllBytes();
         }
