@@ -13,6 +13,9 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import upload.strategy.UploadStrategy;
+import upload.strategy.UploadWithCaptionStrategy;
+import upload.strategy.UploadWithNoCaptionStrategy;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -65,15 +68,25 @@ public class VideoService {
 
             String userId = videoDTO.getUserId(); //todo: send to user service?
 
-            // Save metadata to DB
-            VideoMetaData videoMetaData = new VideoMetaData();
-            videoMetaData.setVideoId(videoId);
-            videoMetaData.setDurationSeconds(0);  //todo  note: this needs an external library like FFMPEG for example
-            videoMetaData.setSizeBytes(file.getSize());
-            videoMetaData.setCaption(videoDTO.getCaption());
-            videoMetaData.setProcessedAt(LocalDateTime.now());
-            videoMetaDataRepository.save(videoMetaData);
+            // Save metadata to DB depending on upload strategy provided from the user request
+            UploadStrategy uploadStrategy;
+            if(videoDTO.getCaption() == null)
+                uploadStrategy = new UploadWithNoCaptionStrategy(videoMetaDataRepository);
+            else
+                uploadStrategy = new UploadWithCaptionStrategy(videoMetaDataRepository);
 
+            uploadStrategy.saveVideoMetaData(videoDTO,file.getSize());
+
+
+//            VideoMetaData videoMetaData = new VideoMetaData();
+//            videoMetaData.setSizeBytes(file.getSize());
+//            videoMetaData.setVideoId(videoId);
+//            videoMetaData.setDurationSeconds(0);  //todo  note: this needs an external library like FFMPEG for example
+//            videoMetaData.setSizeBytes(file.getSize());
+//            videoMetaData.setCaption(videoDTO.getCaption());
+//            videoMetaData.setProcessedAt(LocalDateTime.now());
+//            videoMetaDataRepository.save(videoMetaData);
+//
 
 
         }
