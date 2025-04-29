@@ -12,9 +12,9 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import com.example.VideoService.strategy.UploadStrategy;
-import com.example.VideoService.strategy.UploadWithCaptionStrategy;
-import com.example.VideoService.strategy.UploadWithNoCaptionStrategy;
+import com.example.VideoService.upload.strategy.UploadStrategy;
+import com.example.VideoService.upload.strategy.UploadWithCaptionStrategy;
+import com.example.VideoService.upload.strategy.UploadWithNoCaptionStrategy;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
