@@ -17,13 +17,14 @@ public class UploadWithCaptionStrategy implements UploadStrategy{
 
     @Override
     public VideoMetaData saveVideoMetaData(VideoDTO videoDTO, long sizeInBytes) {
-        VideoMetaData videoMetaData = new VideoMetaData();
+        VideoMetaData videoMetaData = new VideoMetaData.Builder()
+                .videoId(videoDTO.getVideoId())
+                .caption(videoDTO.getCaption())
+                .sizeBytes(sizeInBytes)
+                .durationSeconds(0)  //todo  note: this needs an external library like FFMPEG for example
+                .processedAt(LocalDateTime.now())
+                .build();
 
-        videoMetaData.setVideoId(videoDTO.getVideoId());
-        videoMetaData.setDurationSeconds(0);  //todo  note: this needs an external library like FFMPEG for example
-        videoMetaData.setSizeBytes(sizeInBytes);
-        videoMetaData.setCaption(videoDTO.getCaption());
-        videoMetaData.setProcessedAt(LocalDateTime.now());
         return videoMetaDataRepository.save(videoMetaData);
     }
 }

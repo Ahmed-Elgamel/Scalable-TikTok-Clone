@@ -29,6 +29,14 @@ public class VideoMetaData {
         this.processedAt = processedAt;
     }
 
+    private VideoMetaData(Builder builder) {
+        this.videoId = builder.videoId;
+        this.caption = builder.caption;
+        this.sizeBytes = builder.sizeBytes;
+        this.durationSeconds = builder.durationSeconds;
+        this.processedAt = builder.processedAt;
+    }
+
     public String getVideoId() {
         return videoId;
     }
@@ -67,5 +75,42 @@ public class VideoMetaData {
 
     public void setProcessedAt(LocalDateTime processedAt) {
         this.processedAt = processedAt;
+    }
+
+    public static class Builder {
+        private String videoId;
+        private String caption=null;
+        private long sizeBytes;
+        private int durationSeconds;
+        private LocalDateTime processedAt;
+
+        public Builder videoId(String videoId) {
+            this.videoId = videoId;
+            return this;
+        }
+
+        public Builder caption(String caption) {
+            this.caption = caption;
+            return this;
+        }
+
+        public Builder sizeBytes(long sizeBytes) {
+            this.sizeBytes = sizeBytes;
+            return this;
+        }
+
+        public Builder durationSeconds(int durationSeconds) {
+            this.durationSeconds = durationSeconds;
+            return this;
+        }
+
+        public Builder processedAt(LocalDateTime processedAt) {
+            this.processedAt = processedAt;
+            return this;
+        }
+
+        public VideoMetaData build() {
+            return new VideoMetaData(this);
+        }
     }
 }

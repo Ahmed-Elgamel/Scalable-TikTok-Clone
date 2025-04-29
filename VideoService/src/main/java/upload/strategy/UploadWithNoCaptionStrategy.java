@@ -17,12 +17,15 @@ public class UploadWithNoCaptionStrategy implements UploadStrategy{
 
     @Override
     public VideoMetaData saveVideoMetaData(VideoDTO videoDTO, long sizeInBytes) {
-        VideoMetaData videoMetaData = new VideoMetaData();
 
-        videoMetaData.setVideoId(videoDTO.getVideoId());
-        videoMetaData.setDurationSeconds(0);  //todo  note: this needs an external library like FFMPEG for example
-        videoMetaData.setSizeBytes(sizeInBytes);
-        videoMetaData.setProcessedAt(LocalDateTime.now());
+
+        VideoMetaData videoMetaData = new VideoMetaData.Builder()
+                .videoId(videoDTO.getVideoId())
+                .sizeBytes(sizeInBytes)
+                .durationSeconds(0)  //todo  note: this needs an external library like FFMPEG for example
+                .processedAt(LocalDateTime.now())
+                .build();
+
         return videoMetaDataRepository.save(videoMetaData);
     }
 }
