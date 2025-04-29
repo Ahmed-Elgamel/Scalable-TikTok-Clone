@@ -1,4 +1,4 @@
-package upload.strategy;
+package com.example.VideoService.strategy;
 
 import com.example.VideoService.dto.VideoDTO;
 import com.example.VideoService.model.VideoMetaData;

@@ -11,8 +11,11 @@ services:
       MONGO_INITDB_DATABASE: video_metadata_db
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongodb_data
     networks:
       - mongodb-network
+
 
   mongo-express:
     image: mongo-express
@@ -63,6 +66,7 @@ services:
 
 volumes:
   minio_data:
+  mongodb_data:
 
 networks:
   minio-network:

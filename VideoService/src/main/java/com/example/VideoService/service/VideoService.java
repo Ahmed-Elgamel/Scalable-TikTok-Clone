@@ -1,7 +1,6 @@
 package com.example.VideoService.service;
 
 import com.example.VideoService.dto.VideoDTO;
-import com.example.VideoService.model.VideoMetaData;
 import com.example.VideoService.repository.VideoMetaDataRepository;
 import io.minio.MinioClient;
 import io.minio.errors.MinioException;
@@ -13,14 +12,13 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import upload.strategy.UploadStrategy;
-import upload.strategy.UploadWithCaptionStrategy;
-import upload.strategy.UploadWithNoCaptionStrategy;
+import com.example.VideoService.strategy.UploadStrategy;
+import com.example.VideoService.strategy.UploadWithCaptionStrategy;
+import com.example.VideoService.strategy.UploadWithNoCaptionStrategy;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
