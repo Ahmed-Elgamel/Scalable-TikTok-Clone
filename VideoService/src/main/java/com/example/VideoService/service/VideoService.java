@@ -6,6 +6,7 @@ import io.minio.MinioClient;
 import io.minio.errors.MinioException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -28,12 +29,16 @@ public class VideoService {
     private final MinioClient minioClient;  // For MinIO
     @Autowired
     private final VideoMetaDataRepository videoMetaDataRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+    private static final String TOPIC = "video-upload-events"; // Kafka topic to which we will send the event
+
 
     @Value("${minio.bucket}")
     private String bucketName;
 
-    public VideoService(S3Client s3Client, MinioClient minioClient, VideoMetaDataRepository videoMetaDataRepository) {
+    public VideoService(S3Client s3Client, MinioClient minioClient, VideoMetaDataRepository videoMetaDataRepository, KafkaTemplate<String, String> kafkaTemplate) {
         this.videoMetaDataRepository = videoMetaDataRepository;
+        this.kafkaTemplate = kafkaTemplate;
         this.s3Client = null;
         this.minioClient = minioClient;
     }
@@ -64,7 +69,7 @@ public class VideoService {
                             .build());
 
 
-            String userId = videoDTO.getUserId(); //todo: send to user service?
+            String userId = videoDTO.getUserId();
 
             // Save metadata to DB depending on upload strategy provided from the user request
             UploadStrategy uploadStrategy;
@@ -75,19 +80,13 @@ public class VideoService {
 
             uploadStrategy.saveVideoMetaData(videoDTO,file.getSize());
 
+            //todo: send to user service?
+            publishUploadEvent(videoId, userId); // send event to kafka to be later on be processed by consumers
 
-//            VideoMetaData videoMetaData = new VideoMetaData();
-//            videoMetaData.setSizeBytes(file.getSize());
-//            videoMetaData.setVideoId(videoId);
-//            videoMetaData.setDurationSeconds(0);  //todo  note: this needs an external library like FFMPEG for example
-//            videoMetaData.setSizeBytes(file.getSize());
-//            videoMetaData.setCaption(videoDTO.getCaption());
-//            videoMetaData.setProcessedAt(LocalDateTime.now());
-//            videoMetaDataRepository.save(videoMetaData);
-//
 
 
         }
+
 
         return videoId;
     }
@@ -114,5 +113,13 @@ public class VideoService {
         }
 
         return fileBytes;
+    }
+
+
+    public void publishUploadEvent(String videoId, String userId){
+
+        String videoUploadEvent = "{\"videoId\": \"" + videoId + "\", " +
+                                        "\"userId\": \"" + userId + "\" }";
+        kafkaTemplate.send(TOPIC, videoUploadEvent);
     }
 }
