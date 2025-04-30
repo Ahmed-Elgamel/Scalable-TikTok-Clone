@@ -9,6 +9,8 @@ services:
       - "2181:2181"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - message-queue-network
 
   kafka:
     image: bitnami/kafka:2.7.0  # Older version of Kafka that uses Zookeeper
@@ -19,10 +21,13 @@ services:
       - KAFKA_BROKER_ID=1
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper
+    networks:
+      - message-queue-network
+
 
 
   mongodb:
@@ -86,6 +91,7 @@ services:
     networks:
       - minio-network
       - mongodb-network
+      - message-queue-network
 
 
 volumes:
@@ -96,6 +102,8 @@ networks:
   minio-network:
     driver: bridge
   mongodb-network:
+    driver: bridge
+  message-queue-network:
     driver: bridge
 
 
