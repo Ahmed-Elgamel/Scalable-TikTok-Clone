@@ -120,6 +120,7 @@ public class VideoService {
 
         String videoUploadEvent = "{\"videoId\": \"" + videoId + "\", " +
                                         "\"userId\": \"" + userId + "\" }";
+        System.out.println("PUBLISHED EVENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         kafkaTemplate.send(TOPIC, videoUploadEvent);
     }
 }

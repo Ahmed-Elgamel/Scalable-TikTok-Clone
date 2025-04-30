@@ -11,7 +11,7 @@ services:
       - ALLOW_ANONYMOUS_LOGIN=yes
     networks:
       - message-queue-network
-
+#######################################################################################################################################
   kafka:
     image: bitnami/kafka:2.7.0  # Older version of Kafka that uses Zookeeper
     container_name: kafka
@@ -27,9 +27,7 @@ services:
       - zookeeper
     networks:
       - message-queue-network
-
-
-
+#######################################################################################################################################
   mongodb:
     image: mongo
     container_name: mongo-container
@@ -44,8 +42,7 @@ services:
       - mongodb_data:/data
     networks:
       - mongodb-network
-
-
+#######################################################################################################################################
   mongo-express:
     image: mongo-express
     container_name: mongo-express
@@ -58,7 +55,7 @@ services:
       ME_CONFIG_MONGODB_SERVER: mongodb
     networks:
       - mongodb-network
-
+#######################################################################################################################################
   minio:
     image: quay.io/minio/minio
     container_name: minio
@@ -73,7 +70,7 @@ services:
       - minio_data:/data
     networks:
       - minio-network
-
+#######################################################################################################################################
   video-ms:
     image: video-ms:latest
     build:
@@ -92,12 +89,26 @@ services:
       - minio-network
       - mongodb-network
       - message-queue-network
-
-
+#######################################################################################################################################
+  newsfeed-ms:
+    image: newsfeed-ms:latest
+    build:
+      context: ./News-Feed-Service
+      dockerfile: Dockerfile
+    container_name: newsfeed-ms-container
+    ports:
+      - "8082:8080"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+    networks:
+      - message-queue-network
+#######################################################################################################################################
 volumes:
   minio_data:
   mongodb_data:
-
+#######################################################################################################################################
 networks:
   minio-network:
     driver: bridge
