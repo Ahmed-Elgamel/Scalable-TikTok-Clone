@@ -7,8 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 public class FeedItem {
     @Id
-    private String feedItemId;
-    private String userId;     // The receiver of the post
+    private String userId;
     private String videoId;
 
     public FeedItem(){
@@ -20,13 +19,7 @@ public class FeedItem {
         this.videoId = videoId;
     }
 
-    public String getFeedItemId() {
-        return feedItemId;
-    }
 
-    public void setFeedItemId(String feedItemId) {
-        this.feedItemId = feedItemId;
-    }
 
     public String getUserId() {
         return userId;
