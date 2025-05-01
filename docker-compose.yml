@@ -2,6 +2,37 @@ version: '3.8'
 
 services:
 
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra
+    ports:
+      - "9042:9042"
+    environment:
+#      - CASSANDRA_USER=admin
+#      - CASSANDRA_PASSWORD=admin
+      - MAX_HEAP_SIZE=4G
+      - HEAP_NEWSIZE=800M
+      - CASSANDRA_CLUSTER_NAME=NewsfeedCluster
+      - CASSANDRA_DC=datacenter1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+#      - CASSANDRA_BROADCAST_ADDRESS=cassandra  # or the container hostname
+#      - CASSANDRA_LISTEN_ADDRESS=cassandra
+#      - CASSANDRA_RPC_ADDRESS=0.0.0.0
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    networks:
+      - cassandra-net
+#######################################################################################################################################
+  cassandra-init:
+    image: cassandra:latest
+    depends_on:
+      - cassandra
+    volumes:
+      - ./News-Feed-Service/init.cql:/init.cql
+    entrypoint: [ "sh", "-c", "sleep 30 && cqlsh cassandra -f /init.cql" ]
+    networks:
+      - cassandra-net
+#######################################################################################################################################
   zookeeper:
     image: bitnami/zookeeper:latest
     container_name: zookeeper
@@ -100,14 +131,20 @@ services:
       - "8082:8080"
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_DATA_CASSANDRA_CONTACT_POINTS: cassandra
+      SPRING_DATA_CASSANDRA_PORT: 9042
+      SPRING_DATA_CASSANDRA_KEYSPACE_NAME: testKeySpace
     depends_on:
       - kafka
+      - cassandra
     networks:
       - message-queue-network
+      - cassandra-net
 #######################################################################################################################################
 volumes:
   minio_data:
   mongodb_data:
+  cassandra_data:
 #######################################################################################################################################
 networks:
   minio-network:
@@ -115,6 +152,8 @@ networks:
   mongodb-network:
     driver: bridge
   message-queue-network:
+    driver: bridge
+  cassandra-net:
     driver: bridge
 
 

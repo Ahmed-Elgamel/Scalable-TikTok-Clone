@@ -1,10 +1,9 @@
 package com.example.News.Feed.Service.model;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.cassandra.core.mapping.Table;
 
-@Document(collection = "feed_item")
-
+@Table
 public class FeedItem {
     @Id
     private String userId;
