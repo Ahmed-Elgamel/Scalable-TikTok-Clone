@@ -26,6 +26,7 @@ public class FollowController {
         Follow createdFollow=followService.handleFollowCommand(followCommand);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdFollow);
 //        return ResponseEntity.ok().build();
+        //
     }
 
 }
