@@ -25,7 +25,7 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
 
     @Override
     protected String getContactPoints() {
-        return "cassandra"; // Docker hostname
+        return "cassandra"; // Docker hostname (i think it is the service name not the docker container name)
     }
 
     @Override

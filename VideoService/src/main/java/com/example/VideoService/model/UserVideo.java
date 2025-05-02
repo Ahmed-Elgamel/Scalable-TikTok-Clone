@@ -1,0 +1,31 @@
+package com.example.VideoService.model;
+
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
+import org.springframework.data.cassandra.core.mapping.*;
+import java.util.UUID;
+import java.time.Instant;
+
+@Table("user_videos")
+public class UserVideo {
+
+    @PrimaryKeyClass
+    public static class UserVideoKey {
+        // partition on userId so a single node contains all the videos uploaded for this user
+        @PrimaryKeyColumn(name = "user_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
+        private UUID userId;
+
+        //sort on upload time so the most recent uploads are firstly fetched
+        @PrimaryKeyColumn(name = "upload_time", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
+        private Instant uploadTime;
+
+    }
+
+    @PrimaryKey
+    private UserVideoKey key;
+
+    @Column("video_id")
+    private UUID videoId;
+
+
+}
+

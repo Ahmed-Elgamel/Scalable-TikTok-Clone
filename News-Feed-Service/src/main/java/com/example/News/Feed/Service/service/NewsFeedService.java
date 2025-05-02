@@ -38,10 +38,13 @@ public class NewsFeedService {
 
     public static List<VideoDTO> buildNewsFeed(String userId){
         // see if there is something in cache
-        // if not then get all the users this user follows (followees)
+        // if not then get all the users this user follows (followees/followings)
         // then get all their uploaded videos
         // store in cache
         // return list of video DTOs
+//        List<String> follwingsIds = new List<>(); // dummy list of followers
+        // get all the uploads of this followings
+        // update database + cache
 
         return null;
     }
