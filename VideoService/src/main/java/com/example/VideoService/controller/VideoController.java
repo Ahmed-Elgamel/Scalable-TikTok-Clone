@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 
 @RestController
 @RequestMapping("/videos")
@@ -30,6 +31,10 @@ public class VideoController {
     public ResponseEntity<String> upload(
             @RequestPart("file") MultipartFile file,
             @RequestPart("metadata") VideoDTO metadata) throws IOException, MinioException, NoSuchAlgorithmException, InvalidKeyException {
+
+        if (metadata.getUploadTime() == null) {
+            metadata.setUploadTime(Instant.now());
+        }
         String videoId = videoService.uploadVideo(metadata, file);
         return ResponseEntity.ok("Uploaded Video with id: " + videoId);
     }
