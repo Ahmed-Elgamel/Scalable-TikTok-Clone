@@ -5,6 +5,7 @@ import com.example.VideoService.model.VideoMetaData;
 import com.example.VideoService.repository.VideoMetaDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 public class UploadWithCaptionStrategy implements UploadStrategy{
@@ -22,7 +23,7 @@ public class UploadWithCaptionStrategy implements UploadStrategy{
                 .caption(videoDTO.getCaption())
                 .sizeBytes(sizeInBytes)
                 .durationSeconds(0)  //todo  note: this needs an external library like FFMPEG for example
-                .processedAt(LocalDateTime.now())
+                .processedAt(Instant.now())
                 .build();
 
         return videoMetaDataRepository.save(videoMetaData);

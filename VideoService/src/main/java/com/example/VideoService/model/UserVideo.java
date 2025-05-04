@@ -1,7 +1,10 @@
 package com.example.VideoService.model;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.time.Instant;
 
@@ -24,7 +27,17 @@ public class UserVideo {
     private UserVideoKey key;
 
     @Column("video_id")
-    private UUID videoId;
+    private UUID videoId; // same as in video
+
+    @Column("durationSeconds")
+    private double durationSeconds;
+    @Column("sizeBytes")
+    private long sizeBytes;
+
+    @Column("caption")
+    private String caption;
+
+
 
 
 }

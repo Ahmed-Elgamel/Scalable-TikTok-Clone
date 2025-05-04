@@ -3,6 +3,7 @@ package com.example.VideoService.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Document(collection = "video_metadata")
@@ -16,12 +17,12 @@ public class VideoMetaData {
     private long sizeBytes;
     private String caption;
 
-    private LocalDateTime processedAt;
+    private Instant processedAt;
 
     public VideoMetaData() {
     }
 
-    public VideoMetaData(String videoId, double durationSeconds, long sizeBytes, String caption, LocalDateTime processedAt) {
+    public VideoMetaData(String videoId, double durationSeconds, long sizeBytes, String caption, Instant processedAt) {
         this.videoId = videoId;
         this.durationSeconds = durationSeconds;
         this.sizeBytes = sizeBytes;
@@ -69,11 +70,11 @@ public class VideoMetaData {
         this.caption = caption;
     }
 
-    public LocalDateTime getProcessedAt() {
+    public Instant getProcessedAt() {
         return processedAt;
     }
 
-    public void setProcessedAt(LocalDateTime processedAt) {
+    public void setProcessedAt(Instant processedAt) {
         this.processedAt = processedAt;
     }
 
@@ -82,7 +83,7 @@ public class VideoMetaData {
         private String caption=null;
         private long sizeBytes;
         private int durationSeconds;
-        private LocalDateTime processedAt;
+        private Instant processedAt;
 
         public Builder videoId(String videoId) {
             this.videoId = videoId;
@@ -104,7 +105,7 @@ public class VideoMetaData {
             return this;
         }
 
-        public Builder processedAt(LocalDateTime processedAt) {
+        public Builder processedAt(Instant processedAt) {
             this.processedAt = processedAt;
             return this;
         }
