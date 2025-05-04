@@ -1,8 +1,10 @@
 package com.example.VideoService.service;
 
+import com.example.VideoService.VideoServiceApplication;
 import com.example.VideoService.dto.FetchUserVideosEventRequest;
 import com.example.VideoService.dto.FetchUserVideosEventResponse;
 import com.example.VideoService.dto.VideoDTO;
+import com.example.VideoService.repository.UserVideoRepository;
 import com.example.VideoService.repository.VideoMetaDataRepository;
 import io.minio.MinioClient;
 import io.minio.errors.MinioException;
@@ -26,6 +28,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class VideoService {
@@ -34,6 +37,8 @@ public class VideoService {
     private final MinioClient minioClient;  // For MinIO
     @Autowired
     private final VideoMetaDataRepository videoMetaDataRepository;
+    @Autowired
+    private final UserVideoRepository userVideoRepository;
     private final KafkaTemplate<String, String> kafkaVideoUploadTemplate;
     private final KafkaTemplate<String, FetchUserVideosEventResponse> kafkaUserVideosResponseTemplate;
     private static final String onVideoUploadTOPIC = "video-upload-events"; // Kafka topic to which we will send the event
@@ -43,8 +48,9 @@ public class VideoService {
     @Value("${minio.bucket}")
     private String bucketName;
 
-    public VideoService(S3Client s3Client, MinioClient minioClient, VideoMetaDataRepository videoMetaDataRepository, KafkaTemplate<String, String> kafkaVideoUploadTemplate, KafkaTemplate<String, FetchUserVideosEventResponse> kafkaUserVideosResponseTemplate) {
+    public VideoService(S3Client s3Client, MinioClient minioClient, VideoMetaDataRepository videoMetaDataRepository, UserVideoRepository userVideoRepository, KafkaTemplate<String, String> kafkaVideoUploadTemplate, KafkaTemplate<String, FetchUserVideosEventResponse> kafkaUserVideosResponseTemplate) {
         this.videoMetaDataRepository = videoMetaDataRepository;
+        this.userVideoRepository = userVideoRepository;
         this.kafkaVideoUploadTemplate = kafkaVideoUploadTemplate;
         this.kafkaUserVideosResponseTemplate = kafkaUserVideosResponseTemplate;
         this.s3Client = null;
@@ -55,6 +61,9 @@ public class VideoService {
     public String uploadVideo(VideoDTO videoDTO, MultipartFile file) throws IOException, MinioException, NoSuchAlgorithmException, InvalidKeyException {
         String videoId = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
         String filename = "videos/" + videoId ;
+
+        videoDTO.setVideoId(videoId.substring(0, videoId.length() - 4)); // remove .mp4
+        videoDTO.setBucketName(bucketName);
 
 
         if (s3Client != null) {
@@ -82,11 +91,12 @@ public class VideoService {
             // Save metadata to DB depending on upload strategy provided from the user request
             UploadStrategy uploadStrategy;
             if(videoDTO.getCaption() == null)
-                uploadStrategy = new UploadWithNoCaptionStrategy(videoMetaDataRepository);
+                uploadStrategy = new UploadWithNoCaptionStrategy(videoMetaDataRepository, userVideoRepository);
             else
-                uploadStrategy = new UploadWithCaptionStrategy(videoMetaDataRepository);
+                uploadStrategy = new UploadWithCaptionStrategy(videoMetaDataRepository, userVideoRepository);
 
-            uploadStrategy.saveVideoMetaData(videoDTO,file.getSize());
+            uploadStrategy.saveVideoMetaData(videoDTO, file.getSize());
+            uploadStrategy.saveUserVideo(videoDTO, file.getSize());
 
             //todo: send to user service?
             publishUploadEvent(videoId, userId); // send event to kafka to be later on be processed by consumers
@@ -140,12 +150,22 @@ public class VideoService {
     )
     public void consumeFetchUserVideoEvent(FetchUserVideosEventRequest fetchUserVideosEventRequest){
         System.out.println("****************************(NEWS-FEED-CONSUMER-GROUP) Consumed event to fetch user's videoss (VIDEO SERVICE)****************************"+ fetchUserVideosEventRequest);
+        UUID userId = fetchUserVideosEventRequest.getUserId();
 
-        List<VideoDTO> userVideos = new ArrayList<>(); // fetch videos of user from database
+        List<VideoDTO> userVideos = userVideoRepository.findByKeyUserId(userId).stream()
+                .map(userVideo -> new VideoDTO(
+                        userVideo.getVideoId(),
+                        userId.toString(),
+                        userVideo.getBucketName(),
+                        userVideo.getCaption(),
+                        userVideo.getKey().getUploadTime()
+                ))
+                .collect(Collectors.toList());
+
         FetchUserVideosEventResponse fetchUserVideosEventResponse = new FetchUserVideosEventResponse(
-                fetchUserVideosEventRequest.getRequestId(),
-                fetchUserVideosEventRequest.getUserId(),
-                userVideos
+                fetchUserVideosEventRequest.getRequestId(), //match request and response
+                userId,                                     // userId
+                userVideos                                  // uploaded videos of this userId
                 );
 
         String replyTopic = fetchUserVideosEventRequest.getReplyTopic();

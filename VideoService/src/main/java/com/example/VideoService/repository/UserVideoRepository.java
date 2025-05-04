@@ -8,4 +8,7 @@ import java.util.UUID;
 
 public interface UserVideoRepository extends CassandraRepository<UserVideo,UserVideo.UserVideoKey> {
     List<UserVideo> findTop10ByKeyUserIdOrderByKeyUploadTimeDesc(UUID userId);
+
+    // Query to find all videos by userId
+    List<UserVideo> findByKeyUserId(UUID userId);
 }

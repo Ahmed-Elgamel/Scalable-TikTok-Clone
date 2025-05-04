@@ -35,7 +35,7 @@ public class VideoDTO {
         return videoId;
     }
 
-    public void setVideoId(String id) {
+    public void setVideoId(String videoId) {
         this.videoId = videoId;
     }
 

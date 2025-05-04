@@ -12,7 +12,7 @@ services:
 #      - CASSANDRA_PASSWORD=admin
       - MAX_HEAP_SIZE=4G
       - HEAP_NEWSIZE=800M
-      - CASSANDRA_CLUSTER_NAME=NewsfeedCluster
+#      - CASSANDRA_CLUSTER_NAME=NewsfeedCluster
       - CASSANDRA_DC=datacenter1
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
 #      - CASSANDRA_BROADCAST_ADDRESS=cassandra  # or the container hostname
@@ -28,8 +28,9 @@ services:
     depends_on:
       - cassandra
     volumes:
-      - ./News-Feed-Service/init.cql:/init.cql
-    entrypoint: [ "sh", "-c", "sleep 30 && cqlsh cassandra -f /init.cql" ]
+      - ./News-Feed-Service/init.cql:/init_news.cql
+      - ./VideoService/init.cql:/init_video.cql
+    entrypoint: [ "sh", "-c", "sleep 30 && cqlsh cassandra -f /init_news.cql && cqlsh cassandra -f /init_video.cql" ]
     networks:
       - cassandra-net
 #######################################################################################################################################
@@ -118,10 +119,12 @@ services:
       - minio
       - kafka
       - cassandra
+      - cassandra-init
     networks:
       - minio-network
       - mongodb-network
       - message-queue-network
+      - cassandra-net
 #######################################################################################################################################
   newsfeed-ms:
     image: newsfeed-ms:latest
@@ -139,6 +142,7 @@ services:
     depends_on:
       - kafka
       - cassandra
+      - cassandra-init
     networks:
       - message-queue-network
       - cassandra-net

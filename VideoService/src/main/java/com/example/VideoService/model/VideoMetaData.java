@@ -2,6 +2,7 @@ package com.example.VideoService.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.time.Instant;
 
@@ -18,15 +19,26 @@ public class VideoMetaData {
 
     private Instant uploadTime;
 
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
+    }
+
+    private String bucketName;
+
     public VideoMetaData() {
     }
 
-    public VideoMetaData(String videoId, double durationSeconds, long sizeBytes, String caption, Instant uploadTime) {
+    public VideoMetaData(String videoId, double durationSeconds, long sizeBytes, String caption, Instant uploadTime, String bucketName) {
         this.videoId = videoId;
         this.durationSeconds = durationSeconds;
         this.sizeBytes = sizeBytes;
         this.caption = caption;
         this.uploadTime = uploadTime;
+        this.bucketName = bucketName;
     }
 
     private VideoMetaData(Builder builder) {
@@ -83,6 +95,12 @@ public class VideoMetaData {
         private long sizeBytes;
         private int durationSeconds;
         private Instant uploadTime;
+        private String bucketName;
+
+        public Builder bucketName(String bucketName) {
+            this.bucketName = bucketName;
+            return this;
+        }
 
         public Builder videoId(String videoId) {
             this.videoId = videoId;

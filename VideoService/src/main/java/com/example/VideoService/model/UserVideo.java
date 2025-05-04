@@ -21,13 +21,36 @@ public class UserVideo {
         @PrimaryKeyColumn(name = "upload_time", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
         private Instant uploadTime;
 
+        public UserVideoKey() {}
+
+        public UserVideoKey(UUID userId, Instant uploadTime) {
+            this.userId = userId;
+            this.uploadTime = uploadTime;
+        }
+
+        public UUID getUserId() {
+            return userId;
+        }
+
+        public void setUserId(UUID userId) {
+            this.userId = userId;
+        }
+
+        public Instant getUploadTime() {
+            return uploadTime;
+        }
+
+        public void setUploadTime(Instant uploadTime) {
+            this.uploadTime = uploadTime;
+        }
+
     }
 
     @PrimaryKey
     private UserVideoKey key;
 
     @Column("video_id")
-    private UUID videoId; // same as in video
+    private String videoId; // same as in video
 
     @Column("duration_seconds")
     private double durationSeconds;
@@ -36,6 +59,18 @@ public class UserVideo {
 
     @Column("caption")
     private String caption;
+    @Column("bucket_name")
+    private String bucketName;
+
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
+    }
+
+
 
     public UserVideoKey getKey() {
         return key;
@@ -45,11 +80,11 @@ public class UserVideo {
         this.key = key;
     }
 
-    public UUID getVideoId() {
+    public String getVideoId() {
         return videoId;
     }
 
-    public void setVideoId(UUID videoId) {
+    public void setVideoId(String videoId) {
         this.videoId = videoId;
     }
 
