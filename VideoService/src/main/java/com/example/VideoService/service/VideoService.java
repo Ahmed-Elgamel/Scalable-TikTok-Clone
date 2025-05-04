@@ -128,7 +128,7 @@ public class VideoService {
 
         String videoUploadEvent = "{\"videoId\": \"" + videoId + "\", " +
                                         "\"userId\": \"" + userId + "\" }";
-        System.out.println("PUBLISHED EVENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        System.out.println("****************************PUBLISHED VIDEO UPLOADED (VIDEO SERVICE)****************************");
         kafkaVideoUploadTemplate.send(onVideoUploadTOPIC, videoUploadEvent);
     }
 
@@ -139,18 +139,18 @@ public class VideoService {
 
     )
     public void consumeFetchUserVideoEvent(FetchUserVideosEventRequest fetchUserVideosEventRequest){
-        System.out.println("received event to fetch user's videoss VIDEO SERVICEEEE "+ fetchUserVideosEventRequest);
+        System.out.println("****************************(NEWS-FEED-CONSUMER-GROUP) Consumed event to fetch user's videoss (VIDEO SERVICE)****************************"+ fetchUserVideosEventRequest);
 
-//        List<VideoDTO> userVideos = new ArrayList<>(); // fetch videos of user from database
-//        FetchUserVideosEventResponse fetchUserVideosEventResponse = new FetchUserVideosEventResponse(
-//                fetchUserVideosEventRequest.getRequestId(),
-//                fetchUserVideosEventRequest.getUserId(),
-//                userVideos
-//                );
-//
-//        String replyTopic = fetchUserVideosEventRequest.getReplyTopic();
-//
-//        kafkaUserVideosResponseTemplate.send(replyTopic, fetchUserVideosEventResponse);
+        List<VideoDTO> userVideos = new ArrayList<>(); // fetch videos of user from database
+        FetchUserVideosEventResponse fetchUserVideosEventResponse = new FetchUserVideosEventResponse(
+                fetchUserVideosEventRequest.getRequestId(),
+                fetchUserVideosEventRequest.getUserId(),
+                userVideos
+                );
+
+        String replyTopic = fetchUserVideosEventRequest.getReplyTopic();
+
+        kafkaUserVideosResponseTemplate.send(replyTopic, fetchUserVideosEventResponse);
 
 
     }

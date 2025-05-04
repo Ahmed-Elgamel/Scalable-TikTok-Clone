@@ -92,14 +92,17 @@ public class NewsFeedService {
         //send event to get videos of a followee
         FetchUserVideosEventRequest fetchUserVideosEventRequest = new FetchUserVideosEventRequest(UUID.randomUUID().toString(), followee, 10, replyTopic);
         kafkaTemplateRequest.send("video.fetch.request", fetchUserVideosEventRequest);
-        System.out.println("sending event to video service to fetch followee videosssssssssssssssssss");
+        System.out.println("****************************sending event to video service to fetch followee videos (NEWSFEED SERVICE)****************************");
 
     }
 
-    @KafkaListener(topics = "video.fetch.response", groupId = "newsfeed-group") // use a FLINK NODE instead of this function?
+    @KafkaListener( topics = "video.fetch.response",
+                    groupId = "newsfeed-videos-consumer-group",
+                    containerFactory = "fetchUserVideosKafkaListenerFactory"
+                    ) // use a FLINK NODE instead of this function?
     public void consumeFetchUserVideosEventResponse(FetchUserVideosEventResponse fetchUserVideosEventResponse){
         // update newsfeed cached and database!!
-        System.out.println("Received the focken videos of the followeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+        System.out.println("****************************Received the focken videos of the followee****************************");
 
     }
 
