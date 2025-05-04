@@ -37,8 +37,44 @@ public class UserVideo {
     @Column("caption")
     private String caption;
 
+    public UserVideoKey getKey() {
+        return key;
+    }
 
+    public void setKey(UserVideoKey key) {
+        this.key = key;
+    }
 
+    public UUID getVideoId() {
+        return videoId;
+    }
 
+    public void setVideoId(UUID videoId) {
+        this.videoId = videoId;
+    }
+
+    public double getDurationSeconds() {
+        return durationSeconds;
+    }
+
+    public void setDurationSeconds(double durationSeconds) {
+        this.durationSeconds = durationSeconds;
+    }
+
+    public long getSizeBytes() {
+        return sizeBytes;
+    }
+
+    public void setSizeBytes(long sizeBytes) {
+        this.sizeBytes = sizeBytes;
+    }
+
+    public String getCaption() {
+        return caption;
+    }
+
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
 }
 
