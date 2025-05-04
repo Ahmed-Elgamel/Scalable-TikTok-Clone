@@ -1,31 +1,74 @@
 package com.example.News.Feed.Service.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.cassandra.core.mapping.Table;
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
+import org.springframework.data.cassandra.core.mapping.*;
 
-@Table
+import java.time.Instant;
+
+@Table("feed_items")
 public class FeedItem {
-    @Id
-    private String userId;
+
+    @PrimaryKeyClass
+    public static class FeedItemKey {
+
+        @PrimaryKeyColumn(name = "user_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
+        private String userId;
+
+        @PrimaryKeyColumn(name = "upload_time", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
+        private Instant uploadTime;
+
+        public FeedItemKey() {}
+
+        public FeedItemKey(String userId, Instant uploadTime) {
+            this.userId = userId;
+            this.uploadTime = uploadTime;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+
+        public Instant getUploadTime() {
+            return uploadTime;
+        }
+
+        public void setUploadTime(Instant uploadTime) {
+            this.uploadTime = uploadTime;
+        }
+    }
+
+    @PrimaryKey
+    private FeedItemKey key;
+
+    @Column("video_id")
     private String videoId;
 
-    public FeedItem(){
+    @Column("bucket_name")
+    private String bucketName;
 
-    }
+    @Column("caption")
+    private String caption;
 
-    public FeedItem(String userId, String videoId) {
-        this.userId = userId;
+    public FeedItem() {}
+
+
+    public FeedItem(FeedItemKey key, String videoId, String bucketName, String caption) {
+        this.key = key;
         this.videoId = videoId;
+        this.bucketName = bucketName;
+        this.caption = caption;
     }
 
-
-
-    public String getUserId() {
-        return userId;
+    public FeedItemKey getKey() {
+        return key;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setKey(FeedItemKey key) {
+        this.key = key;
     }
 
     public String getVideoId() {
@@ -34,5 +77,29 @@ public class FeedItem {
 
     public void setVideoId(String videoId) {
         this.videoId = videoId;
+    }
+
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
+    }
+
+    public String getCaption() {
+        return caption;
+    }
+
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
+
+    public Instant getUploadTime() {
+        return key != null ? key.getUploadTime() : null;
+    }
+
+    public String getUserId() {
+        return key != null ? key.getUserId() : null;
     }
 }

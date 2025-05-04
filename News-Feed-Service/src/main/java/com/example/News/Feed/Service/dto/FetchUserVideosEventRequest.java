@@ -4,8 +4,10 @@ import java.util.UUID;
 
 public class FetchUserVideosEventRequest {
 
-    private String requestId;     // Unique ID to match request and response
-    private String userId;        // The user whose videos we want
+    private UUID requestId;     // Unique ID to match request and response
+    private UUID targetUserId;
+
+    private UUID userId;        // The user whose videos we want
     private int limit;          // How many videos to fetch
     private String replyTopic;  // Kafka topic for sending the response
 
@@ -13,27 +15,28 @@ public class FetchUserVideosEventRequest {
     public FetchUserVideosEventRequest() {
     }
 
-    public FetchUserVideosEventRequest(String requestId, String userId, int limit, String replyTopic) {
+    public FetchUserVideosEventRequest(UUID requestId, UUID targetUserId, UUID userId, int limit, String replyTopic) {
         this.requestId = requestId;
         this.userId = userId;
         this.limit = limit;
         this.replyTopic = replyTopic;
+        this.targetUserId = targetUserId;
     }
 
     // Getters and Setters
-    public String getRequestId() {
+    public UUID getRequestId() {
         return requestId;
     }
 
-    public void setRequestId(String requestId) {
+    public void setRequestId(UUID requestId) {
         this.requestId = requestId;
     }
 
-    public String getUserId() {
+    public UUID getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(UUID userId) {
         this.userId = userId;
     }
 
@@ -51,6 +54,14 @@ public class FetchUserVideosEventRequest {
 
     public void setReplyTopic(String replyTopic) {
         this.replyTopic = replyTopic;
+    }
+
+    public UUID getTargetUserId() {
+        return targetUserId;
+    }
+
+    public void setTargetUserId(UUID targetUserId) {
+        this.targetUserId = targetUserId;
     }
 }
 

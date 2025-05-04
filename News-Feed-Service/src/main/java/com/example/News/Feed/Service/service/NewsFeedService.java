@@ -4,6 +4,7 @@ import com.example.News.Feed.Service.dto.FetchUserVideosEventRequest;
 import com.example.News.Feed.Service.dto.FeedDTO;
 import com.example.News.Feed.Service.dto.FetchUserVideosEventResponse;
 import com.example.News.Feed.Service.dto.VideoUploadEvent;
+import com.example.News.Feed.Service.model.FeedItem;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.protocol.types.Field;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class NewsFeedService {
@@ -60,7 +62,7 @@ public class NewsFeedService {
 
 
     public List<FeedDTO> buildNewsFeed(String userId){
-        // see if there is something in cache
+        // see if there is something in cache if yes return it
         // if not then get all the users this user follows (followees/followings)
         // then get all their uploaded videos
         // store in cache
@@ -70,7 +72,8 @@ public class NewsFeedService {
 
         // if not cached do this
         for (String followee: followeesIds){
-            sendFetchUserVideosEvent(followee,"video.fetch.response");
+            // fire and forget (non-blocking operation because we dont wait for the response)
+            sendFetchUserVideosEvent(userId ,followee,"video.fetch.response");
         }
 
         return null;
@@ -88,9 +91,14 @@ public class NewsFeedService {
 
     }
 
-    public void sendFetchUserVideosEvent(String followee, String replyTopic){
+    public void sendFetchUserVideosEvent(String targetUserId,String followee, String replyTopic){
         //send event to get videos of a followee
-        FetchUserVideosEventRequest fetchUserVideosEventRequest = new FetchUserVideosEventRequest(UUID.randomUUID().toString(), followee, 10, replyTopic);
+        FetchUserVideosEventRequest fetchUserVideosEventRequest = new FetchUserVideosEventRequest(
+                UUID.randomUUID(),
+                UUID.fromString(targetUserId),
+                UUID.fromString(followee),
+                10,
+                replyTopic);
         kafkaTemplateRequest.send("video.fetch.request", fetchUserVideosEventRequest);
         System.out.println("****************************sending event to video service to fetch followee videos (NEWSFEED SERVICE)****************************");
 
@@ -101,8 +109,18 @@ public class NewsFeedService {
                     containerFactory = "fetchUserVideosKafkaListenerFactory"
                     ) // use a FLINK NODE instead of this function?
     public void consumeFetchUserVideosEventResponse(FetchUserVideosEventResponse fetchUserVideosEventResponse){
-        // update newsfeed cached and database!!
+        // update newsfeed cache and database!!
         System.out.println("****************************Received the focken videos of the followee****************************");
+        List<FeedItem> feedItems = fetchUserVideosEventResponse.getVideos().stream().
+                map(userVideoDTO ->
+                        new FeedItem(
+                                new FeedItem.FeedItemKey(userVideoDTO.getUserId(), userVideoDTO.getUploadTime()),
+                                userVideoDTO.getVideoId(),
+                                userVideoDTO.getBucketName(),
+                                userVideoDTO.getCaption()
+                                    )).
+                collect(Collectors.toList());
+        // save to cache and db
 
     }
 

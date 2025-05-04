@@ -6,6 +6,8 @@ import java.util.UUID;
 public class FetchUserVideosEventResponse {
 
     private UUID requestId;       // To match the request and response
+    private UUID targetUserId;
+
     private UUID userId;          // The user whose videos were fetched
     private List<VideoDTO> videos; // The list of fetched videos
 
@@ -15,10 +17,11 @@ public class FetchUserVideosEventResponse {
     }
 
     // Constructor to populate the response
-    public FetchUserVideosEventResponse(UUID requestId, UUID userId, List<VideoDTO> videos) {
+    public FetchUserVideosEventResponse(UUID requestId, UUID targetUserId, UUID userId, List<VideoDTO> videos) {
         this.requestId = requestId;
         this.userId = userId;
         this.videos = videos;
+        this.targetUserId = targetUserId;
 
     }
 
@@ -47,4 +50,11 @@ public class FetchUserVideosEventResponse {
         this.videos = videos;
     }
 
+    public UUID getTargetUserId() {
+        return targetUserId;
+    }
+
+    public void setTargetUserId(UUID targetUserId) {
+        this.targetUserId = targetUserId;
+    }
 }
