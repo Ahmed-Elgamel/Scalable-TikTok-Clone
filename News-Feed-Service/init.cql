@@ -11,9 +11,12 @@ WITH replication = {
 USE newsfeed;
 
 -- Step 3: Create a user_feed table
-CREATE TABLE IF NOT EXISTS user_feed (
+CREATE TABLE IF NOT EXISTS feed_items (
     user_id TEXT,
-    timestamp TIMESTAMP,
+    upload_time TIMESTAMP,
     video_id TEXT,
-    PRIMARY KEY (user_id, timestamp)
-) WITH CLUSTERING ORDER BY (timestamp DESC);
+    bucket_name TEXT,
+    caption TEXT,
+    PRIMARY KEY (user_id, upload_time)
+) WITH CLUSTERING ORDER BY (upload_time DESC);
+

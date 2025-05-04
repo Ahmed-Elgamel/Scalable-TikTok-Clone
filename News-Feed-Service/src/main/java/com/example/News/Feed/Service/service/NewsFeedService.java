@@ -5,9 +5,9 @@ import com.example.News.Feed.Service.dto.FeedDTO;
 import com.example.News.Feed.Service.dto.FetchUserVideosEventResponse;
 import com.example.News.Feed.Service.dto.VideoUploadEvent;
 import com.example.News.Feed.Service.model.FeedItem;
+import com.example.News.Feed.Service.repository.FeedItemRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class NewsFeedService {
      FAN-OUT-ON-WRITE --> normal users
      */
     List<String> followeesIds = Arrays.asList(
-            "b3c7f282-9f8d-4c37-a5b7-1d2d70ec6f52"
+           "e4eaaaf2-d142-11e1-b3e4-080027620cdd"
 //            ,
 //            "f91f9423-0f8e-4ea3-9bd7-c9d2c1c7639e",
 //            "4cdbd23e-4425-4c1d-8f16-871b21a379ce",
@@ -45,11 +45,13 @@ public class NewsFeedService {
     ); // fetched from follow service !!!!!!
 
     private final KafkaTemplate<String, FetchUserVideosEventRequest> kafkaTemplateRequest;
+    private final FeedItemRepository feedItemRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public NewsFeedService(KafkaTemplate<String, FetchUserVideosEventRequest> kafkaTemplateRequest) {
+    public NewsFeedService(KafkaTemplate<String, FetchUserVideosEventRequest> kafkaTemplateRequest, FeedItemRepository feedItemRepository) {
         this.kafkaTemplateRequest = kafkaTemplateRequest;
+        this.feedItemRepository = feedItemRepository;
     }
 
     public void addFeedItem(String userId, String videoId) {
@@ -121,6 +123,8 @@ public class NewsFeedService {
                                     )).
                 collect(Collectors.toList());
         // save to cache and db
+
+        feedItemRepository.saveAll(feedItems);
 
     }
 
