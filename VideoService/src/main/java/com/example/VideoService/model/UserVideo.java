@@ -29,9 +29,9 @@ public class UserVideo {
     @Column("video_id")
     private UUID videoId; // same as in video
 
-    @Column("durationSeconds")
+    @Column("duration_seconds")
     private double durationSeconds;
-    @Column("sizeBytes")
+    @Column("size_bytes")
     private long sizeBytes;
 
     @Column("caption")

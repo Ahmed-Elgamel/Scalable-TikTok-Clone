@@ -4,7 +4,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Document(collection = "video_metadata")
 
@@ -17,17 +16,17 @@ public class VideoMetaData {
     private long sizeBytes;
     private String caption;
 
-    private Instant processedAt;
+    private Instant uploadTime;
 
     public VideoMetaData() {
     }
 
-    public VideoMetaData(String videoId, double durationSeconds, long sizeBytes, String caption, Instant processedAt) {
+    public VideoMetaData(String videoId, double durationSeconds, long sizeBytes, String caption, Instant uploadTime) {
         this.videoId = videoId;
         this.durationSeconds = durationSeconds;
         this.sizeBytes = sizeBytes;
         this.caption = caption;
-        this.processedAt = processedAt;
+        this.uploadTime = uploadTime;
     }
 
     private VideoMetaData(Builder builder) {
@@ -35,7 +34,7 @@ public class VideoMetaData {
         this.caption = builder.caption;
         this.sizeBytes = builder.sizeBytes;
         this.durationSeconds = builder.durationSeconds;
-        this.processedAt = builder.processedAt;
+        this.uploadTime = builder.uploadTime;
     }
 
     public String getVideoId() {
@@ -70,12 +69,12 @@ public class VideoMetaData {
         this.caption = caption;
     }
 
-    public Instant getProcessedAt() {
-        return processedAt;
+    public Instant getUploadTime() {
+        return uploadTime;
     }
 
-    public void setProcessedAt(Instant processedAt) {
-        this.processedAt = processedAt;
+    public void setUploadTime(Instant uploadTime) {
+        this.uploadTime = uploadTime;
     }
 
     public static class Builder {
@@ -83,7 +82,7 @@ public class VideoMetaData {
         private String caption=null;
         private long sizeBytes;
         private int durationSeconds;
-        private Instant processedAt;
+        private Instant uploadTime;
 
         public Builder videoId(String videoId) {
             this.videoId = videoId;
@@ -105,8 +104,8 @@ public class VideoMetaData {
             return this;
         }
 
-        public Builder processedAt(Instant processedAt) {
-            this.processedAt = processedAt;
+        public Builder processedAt(Instant uploadTime) {
+            this.uploadTime = uploadTime;
             return this;
         }
 
