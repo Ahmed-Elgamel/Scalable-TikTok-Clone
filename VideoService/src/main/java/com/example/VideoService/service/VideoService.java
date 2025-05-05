@@ -163,12 +163,18 @@ public class VideoService {
                 ))
                 .collect(Collectors.toList());
 
+
+
         FetchUserVideosEventResponse fetchUserVideosEventResponse = new FetchUserVideosEventResponse(
                 fetchUserVideosEventRequest.getRequestId(), //match request and response
                 targetUserId,                               // user who wants these videos
                 userId,                                     // userId
                 userVideos                                  // uploaded videos of this userId
                 );
+
+        for(VideoDTO videoDTO: fetchUserVideosEventResponse.getVideos()){
+            System.out.println(videoDTO.getVideoId()+ " this is the video id bitchhhhhhhh");
+        }
 
         String replyTopic = fetchUserVideosEventRequest.getReplyTopic();
 

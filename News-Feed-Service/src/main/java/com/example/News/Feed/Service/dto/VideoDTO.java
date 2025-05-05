@@ -8,7 +8,8 @@ public class VideoDTO {
     private String userId;
     private String bucketName;
     private String caption;
-    private Instant uploadTime;
+    private Instant uploadTime; // Do not set this in the constructor, will be set programmatically
+
 
     // Constructors
     public VideoDTO() {
@@ -22,13 +23,19 @@ public class VideoDTO {
         this.caption = caption;
         this.uploadTime = uploadTime;
     }
-
+    public VideoDTO(String videoId, String userId, String bucketName, String caption) {
+        this.videoId = videoId;
+        this.userId = userId;
+        this.bucketName = bucketName;
+        this.caption = caption;
+        this.uploadTime = Instant.now(); // Set the current time programmatically
+    }
     // Getters and Setters
     public String getVideoId() {
         return videoId;
     }
 
-    public void setVideoId(String id) {
+    public void setVideoId(String videoId) {
         this.videoId = videoId;
     }
 

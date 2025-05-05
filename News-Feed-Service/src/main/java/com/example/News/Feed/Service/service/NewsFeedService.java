@@ -123,6 +123,10 @@ public class NewsFeedService {
                                     )).
                 collect(Collectors.toList());
 
+        for(VideoDTO videoDTO: fetchUserVideosEventResponse.getVideos()){
+            System.out.println(videoDTO.getVideoId()+ " this is the video id bitchhhhhhhh");
+        }
+
         // save to db and cache
         feedItemRepository.saveAll(feedItems); //save to db
 
