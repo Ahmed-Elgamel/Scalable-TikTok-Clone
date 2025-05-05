@@ -1,20 +1,16 @@
 package com.example.News.Feed.Service.service;
 
-import com.example.News.Feed.Service.dto.FetchUserVideosEventRequest;
-import com.example.News.Feed.Service.dto.FeedDTO;
-import com.example.News.Feed.Service.dto.FetchUserVideosEventResponse;
-import com.example.News.Feed.Service.dto.VideoUploadEvent;
+import com.example.News.Feed.Service.dto.*;
 import com.example.News.Feed.Service.model.FeedItem;
 import com.example.News.Feed.Service.repository.FeedItemRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,12 +42,16 @@ public class NewsFeedService {
 
     private final KafkaTemplate<String, FetchUserVideosEventRequest> kafkaTemplateRequest;
     private final FeedItemRepository feedItemRepository;
+    @Autowired
+    private final FeedCacheService feedCacheService;
+
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public NewsFeedService(KafkaTemplate<String, FetchUserVideosEventRequest> kafkaTemplateRequest, FeedItemRepository feedItemRepository) {
+    public NewsFeedService(KafkaTemplate<String, FetchUserVideosEventRequest> kafkaTemplateRequest, FeedItemRepository feedItemRepository, FeedCacheService feedCacheService) {
         this.kafkaTemplateRequest = kafkaTemplateRequest;
         this.feedItemRepository = feedItemRepository;
+        this.feedCacheService = feedCacheService;
     }
 
     public void addFeedItem(String userId, String videoId) {
@@ -122,9 +122,41 @@ public class NewsFeedService {
                                 userVideoDTO.getCaption()
                                     )).
                 collect(Collectors.toList());
-        // save to cache and db
 
-        feedItemRepository.saveAll(feedItems);
+        // save to db and cache
+        feedItemRepository.saveAll(feedItems); //save to db
+
+        String targetUserId = fetchUserVideosEventResponse.getTargetUserId().toString();
+        List<VideoDTO> cachedFeedOfTargetUser = feedCacheService.getCachedFeedItems(targetUserId);
+        List<VideoDTO> updatedFeedOfTargetUser = new ArrayList<>();
+
+        if(cachedFeedOfTargetUser != null)
+            updatedFeedOfTargetUser.addAll(cachedFeedOfTargetUser); // add the already cached feed to the list
+
+
+        List<VideoDTO> newFeedVideos = fetchUserVideosEventResponse.getVideos().stream().map(
+                userVideoDTO ->
+                new VideoDTO(
+                        userVideoDTO.getVideoId(),
+                        userVideoDTO.getUserId(),
+                        userVideoDTO.getBucketName(),
+                        userVideoDTO.getCaption(),
+                        userVideoDTO.getUploadTime())
+        ).collect(Collectors.toList());
+
+        updatedFeedOfTargetUser.addAll(newFeedVideos);  // add new videos to the list
+
+        // remove duplicates based on videoId
+        Map<String, VideoDTO> deduplicated = new LinkedHashMap<>();
+        for (VideoDTO video : updatedFeedOfTargetUser) {
+            deduplicated.put(video.getVideoId(), video);
+        }
+        List<VideoDTO> finalFeed = new ArrayList<>(deduplicated.values()); // now we have the final feed
+
+        // Sort needed because it is a feed
+        finalFeed.sort(Comparator.comparing(VideoDTO::getUploadTime).reversed());
+
+        feedCacheService.cacheFeedItems(targetUserId, finalFeed); // finally store the new feed of target usr in cache
 
     }
 

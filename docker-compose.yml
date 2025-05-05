@@ -1,7 +1,14 @@
 version: '3.8'
 
 services:
-
+  redis:
+    image: redis
+    container_name: redis-server
+    ports:
+      - "6380:6379"  # Host port:Container port
+    networks:
+      - redis-net
+#######################################################################################################################################
   cassandra:
     image: cassandra:latest
     container_name: cassandra
@@ -139,13 +146,17 @@ services:
       SPRING_DATA_CASSANDRA_CONTACT_POINTS: cassandra
       SPRING_DATA_CASSANDRA_PORT: 9042
       SPRING_DATA_CASSANDRA_KEYSPACE_NAME: testKeySpace
+#      SPRING_REDIS_HOST: redis-server
+#      SPRING_REDIS_PORT: 6379
     depends_on:
       - kafka
       - cassandra
       - cassandra-init
+      - redis
     networks:
       - message-queue-network
       - cassandra-net
+      - redis-net
 #######################################################################################################################################
 volumes:
   minio_data:
@@ -160,6 +171,8 @@ networks:
   message-queue-network:
     driver: bridge
   cassandra-net:
+    driver: bridge
+  redis-net:
     driver: bridge
 
 
