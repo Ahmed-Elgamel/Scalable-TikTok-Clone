@@ -19,6 +19,8 @@ public class VideoMetaData {
 
     private Instant uploadTime;
 
+    private String bucketName;
+
     public String getBucketName() {
         return bucketName;
     }
@@ -27,7 +29,7 @@ public class VideoMetaData {
         this.bucketName = bucketName;
     }
 
-    private String bucketName;
+
 
     public VideoMetaData() {
     }
@@ -47,6 +49,7 @@ public class VideoMetaData {
         this.sizeBytes = builder.sizeBytes;
         this.durationSeconds = builder.durationSeconds;
         this.uploadTime = builder.uploadTime;
+        this.bucketName = builder.bucketName;
     }
 
     public String getVideoId() {
