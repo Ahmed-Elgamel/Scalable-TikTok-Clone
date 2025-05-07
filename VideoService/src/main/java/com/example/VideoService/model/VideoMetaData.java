@@ -55,7 +55,11 @@ public class VideoMetaData {
         this.durationSeconds = builder.durationSeconds;
         this.uploadTime = builder.uploadTime;
         this.bucketName = builder.bucketName;
-        this.tags = builder.tags;
+
+        if(builder.tags != null)
+            this.tags = builder.tags;
+        else
+            this.tags = new ArrayList<>();
     }
 
     public String getVideoId() {
