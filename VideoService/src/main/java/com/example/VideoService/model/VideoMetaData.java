@@ -5,6 +5,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Document(collection = "video_metadata")
 
@@ -20,6 +22,8 @@ public class VideoMetaData {
     private Instant uploadTime;
 
     private String bucketName;
+
+    private List<String> tags;
 
     public String getBucketName() {
         return bucketName;
@@ -41,6 +45,7 @@ public class VideoMetaData {
         this.caption = caption;
         this.uploadTime = uploadTime;
         this.bucketName = bucketName;
+        this.tags = new ArrayList<>();
     }
 
     private VideoMetaData(Builder builder) {
@@ -50,6 +55,7 @@ public class VideoMetaData {
         this.durationSeconds = builder.durationSeconds;
         this.uploadTime = builder.uploadTime;
         this.bucketName = builder.bucketName;
+        this.tags = builder.tags;
     }
 
     public String getVideoId() {
@@ -99,6 +105,12 @@ public class VideoMetaData {
         private int durationSeconds;
         private Instant uploadTime;
         private String bucketName;
+        private List<String> tags;
+
+        public Builder tags(List<String> tags) {
+            this.tags = tags;
+            return this;
+        }
 
         public Builder bucketName(String bucketName) {
             this.bucketName = bucketName;
