@@ -11,9 +11,8 @@ public class VideoDTO {
     private String bucketName;
     private String caption;
     private Instant uploadTime; // Do not set this in the constructor, will be set programmatically
-
-
     private List<String> tags;
+    private double durationSeconds;
 
 
     // Constructors
@@ -21,13 +20,14 @@ public class VideoDTO {
     }
 
     public VideoDTO(String videoId, String userId, String bucketName,
-                    String caption, Instant uploadTime, List<String> tags) {
+                    String caption, Instant uploadTime, List<String> tags, double durationSeconds) {
         this.videoId = videoId;
         this.userId = userId;
         this.bucketName = bucketName;
         this.caption = caption;
         this.uploadTime = uploadTime;
         this.tags = tags;
+        this.durationSeconds = durationSeconds;
     }
     public VideoDTO(String videoId, String userId, String bucketName, String caption) {
         this.videoId = videoId;
@@ -83,6 +83,14 @@ public class VideoDTO {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    public double getDurationSeconds() {
+        return durationSeconds;
+    }
+
+    public void setDurationSeconds(double durationSeconds) {
+        this.durationSeconds = durationSeconds;
     }
 
 

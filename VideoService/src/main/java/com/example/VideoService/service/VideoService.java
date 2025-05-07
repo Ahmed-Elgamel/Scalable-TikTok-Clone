@@ -95,8 +95,8 @@ public class VideoService {
             else
                 uploadStrategy = new UploadWithCaptionStrategy(videoMetaDataRepository, userVideoRepository);
 
-            uploadStrategy.saveVideoMetaData(videoDTO, file.getSize());
-            uploadStrategy.saveUserVideo(videoDTO, file.getSize());
+            uploadStrategy.saveVideoMetaData(videoDTO, file);
+            uploadStrategy.saveUserVideo(videoDTO, file);
 
             //todo: send to user service?
             publishUploadEvent(videoId, userId); // send event to kafka to be later on be processed by consumers
@@ -160,7 +160,8 @@ public class VideoService {
                         userVideo.getBucketName(),
                         userVideo.getCaption(),
                         userVideo.getKey().getUploadTime(),
-                        userVideo.getTags()
+                        userVideo.getTags(),
+                        userVideo.getDurationSeconds()
 
                 ))
                 .collect(Collectors.toList());

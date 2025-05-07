@@ -57,17 +57,20 @@ public class FeedItem {
 
     @Column("tags")
     private List<String> tags;
+    @Column("duration_seconds")
+    private double durationSeconds;
 
 
     public FeedItem() {}
 
 
-    public FeedItem(FeedItemKey key, String videoId, String bucketName, String caption, List<String> tags) {
+    public FeedItem(FeedItemKey key, String videoId, String bucketName, String caption, List<String> tags, double durationSeconds) {
         this.key = key;
         this.videoId = videoId;
         this.bucketName = bucketName;
         this.caption = caption;
         this.tags = tags;
+        this.durationSeconds = durationSeconds;
     }
 
     public FeedItemKey getKey() {

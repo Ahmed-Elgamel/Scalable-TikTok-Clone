@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS feed_items (
     bucket_name TEXT,
     caption TEXT,
     tags LIST<TEXT>,
+    duration_seconds DOUBLE,
     PRIMARY KEY (user_id, upload_time)
 ) WITH CLUSTERING ORDER BY (upload_time DESC);
 

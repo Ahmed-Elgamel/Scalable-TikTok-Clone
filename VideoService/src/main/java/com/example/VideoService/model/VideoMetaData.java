@@ -106,7 +106,7 @@ public class VideoMetaData {
         private String videoId;
         private String caption=null;
         private long sizeBytes;
-        private int durationSeconds;
+        private double durationSeconds;
         private Instant uploadTime;
         private String bucketName;
         private List<String> tags;
@@ -136,7 +136,7 @@ public class VideoMetaData {
             return this;
         }
 
-        public Builder durationSeconds(int durationSeconds) {
+        public Builder durationSeconds(double durationSeconds) {
             this.durationSeconds = durationSeconds;
             return this;
         }

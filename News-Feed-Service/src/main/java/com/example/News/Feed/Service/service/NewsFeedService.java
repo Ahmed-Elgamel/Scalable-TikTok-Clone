@@ -120,7 +120,8 @@ public class NewsFeedService {
                                 userVideoDTO.getVideoId(),
                                 userVideoDTO.getBucketName(),
                                 userVideoDTO.getCaption(),
-                                userVideoDTO.getTags()
+                                userVideoDTO.getTags(),
+                                userVideoDTO.getDurationSeconds()
                                     )).
                 collect(Collectors.toList());
 
@@ -146,7 +147,10 @@ public class NewsFeedService {
                         userVideoDTO.getUserId(),
                         userVideoDTO.getBucketName(),
                         userVideoDTO.getCaption(),
-                        userVideoDTO.getUploadTime())
+                        userVideoDTO.getUploadTime(),
+                        userVideoDTO.getTags(),
+                        userVideoDTO.getDurationSeconds()
+                )
         ).collect(Collectors.toList());
 
         updatedFeedOfTargetUser.addAll(newFeedVideos);  // add new videos to the list
