@@ -5,6 +5,7 @@ import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import java.time.Instant;
 
@@ -62,6 +63,9 @@ public class UserVideo {
     @Column("bucket_name")
     private String bucketName;
 
+    @Column("tags")
+    private List<String> tags;
+
     public String getBucketName() {
         return bucketName;
     }
@@ -110,6 +114,14 @@ public class UserVideo {
 
     public void setCaption(String caption) {
         this.caption = caption;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 }
 

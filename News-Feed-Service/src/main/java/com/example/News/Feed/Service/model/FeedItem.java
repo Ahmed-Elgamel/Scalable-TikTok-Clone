@@ -1,9 +1,11 @@
 package com.example.News.Feed.Service.model;
 
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
 import java.time.Instant;
+import java.util.List;
 
 @Table("feed_items")
 public class FeedItem {
@@ -53,14 +55,19 @@ public class FeedItem {
     @Column("caption")
     private String caption;
 
+    @Column("tags")
+    private List<String> tags;
+
+
     public FeedItem() {}
 
 
-    public FeedItem(FeedItemKey key, String videoId, String bucketName, String caption) {
+    public FeedItem(FeedItemKey key, String videoId, String bucketName, String caption, List<String> tags) {
         this.key = key;
         this.videoId = videoId;
         this.bucketName = bucketName;
         this.caption = caption;
+        this.tags = tags;
     }
 
     public FeedItemKey getKey() {

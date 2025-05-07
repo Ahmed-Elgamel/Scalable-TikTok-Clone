@@ -16,5 +16,6 @@ CREATE TABLE IF NOT EXISTS user_videos (
   size_bytes BIGINT,        -- Size in bytes
   caption TEXT,             -- Video caption
   bucket_name TEXT,         -- Bucket name video is stored in
+  tags LIST<TEXT>,          -- list of tags of the video
   PRIMARY KEY ((user_id), upload_time)
 ) WITH CLUSTERING ORDER BY (upload_time DESC);

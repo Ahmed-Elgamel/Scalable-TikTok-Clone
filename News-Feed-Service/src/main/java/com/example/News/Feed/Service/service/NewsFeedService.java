@@ -119,7 +119,8 @@ public class NewsFeedService {
                                 new FeedItem.FeedItemKey(userVideoDTO.getUserId(), userVideoDTO.getUploadTime()),
                                 userVideoDTO.getVideoId(),
                                 userVideoDTO.getBucketName(),
-                                userVideoDTO.getCaption()
+                                userVideoDTO.getCaption(),
+                                userVideoDTO.getTags()
                                     )).
                 collect(Collectors.toList());
 

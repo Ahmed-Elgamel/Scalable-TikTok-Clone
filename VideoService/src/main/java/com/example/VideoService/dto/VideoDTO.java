@@ -21,13 +21,13 @@ public class VideoDTO {
     }
 
     public VideoDTO(String videoId, String userId, String bucketName,
-                    String caption, Instant uploadTime) {
+                    String caption, Instant uploadTime, List<String> tags) {
         this.videoId = videoId;
         this.userId = userId;
         this.bucketName = bucketName;
         this.caption = caption;
         this.uploadTime = uploadTime;
-        this.tags = new ArrayList<>();
+        this.tags = tags;
     }
     public VideoDTO(String videoId, String userId, String bucketName, String caption) {
         this.videoId = videoId;

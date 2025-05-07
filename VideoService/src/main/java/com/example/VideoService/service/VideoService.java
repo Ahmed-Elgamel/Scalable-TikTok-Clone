@@ -159,7 +159,9 @@ public class VideoService {
                         userId.toString(),
                         userVideo.getBucketName(),
                         userVideo.getCaption(),
-                        userVideo.getKey().getUploadTime()
+                        userVideo.getKey().getUploadTime(),
+                        userVideo.getTags()
+
                 ))
                 .collect(Collectors.toList());
 
