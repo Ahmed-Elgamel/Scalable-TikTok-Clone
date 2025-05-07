@@ -2,6 +2,8 @@ package com.example.VideoService.dto;
 
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class VideoDTO {
     private String videoId;
@@ -9,6 +11,9 @@ public class VideoDTO {
     private String bucketName;
     private String caption;
     private Instant uploadTime; // Do not set this in the constructor, will be set programmatically
+
+
+    private List<String> tags;
 
 
     // Constructors
@@ -22,6 +27,7 @@ public class VideoDTO {
         this.bucketName = bucketName;
         this.caption = caption;
         this.uploadTime = uploadTime;
+        this.tags = new ArrayList<>();
     }
     public VideoDTO(String videoId, String userId, String bucketName, String caption) {
         this.videoId = videoId;
@@ -69,6 +75,14 @@ public class VideoDTO {
 
     public void setUploadTime(Instant uploadTime) {
         this.uploadTime = uploadTime;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
 
