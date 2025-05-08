@@ -4,6 +4,7 @@ import com.example.VideoService.VideoServiceApplication;
 import com.example.VideoService.dto.FetchUserVideosEventRequest;
 import com.example.VideoService.dto.FetchUserVideosEventResponse;
 import com.example.VideoService.dto.VideoDTO;
+import com.example.VideoService.model.UserVideo;
 import com.example.VideoService.repository.UserVideoRepository;
 import com.example.VideoService.repository.VideoMetaDataRepository;
 import io.minio.MinioClient;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import com.example.VideoService.upload.strategy.UploadStrategy;
@@ -27,6 +29,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -185,6 +188,62 @@ public class VideoService {
 
 
     }
+
+
+
+    public String deleteVideoById(UUID userId, String videoId) {
+        try {
+            // Step 1: Find all videos for the user
+            List<UserVideo> videos = userVideoRepository.findByKeyUserId(userId);
+
+            // Step 2: Filter the video by videoId
+            Optional<UserVideo> videoToDelete = videos.stream()
+                    .filter(video -> video.getVideoId().equals(videoId))
+                    .findFirst();
+
+            if (videoToDelete.isEmpty()) {
+                return "Video not found for userId: " + userId + " and videoId: " + videoId;
+            }
+
+            UserVideo video = videoToDelete.get();
+            UserVideo.UserVideoKey key =video.getKey();
+
+            // Step 3: Construct the filename for S3/MinIO
+            String filename = "videos/" + videoId + ".mp4"; // assuming mp4 format
+
+            // Step 4: Delete from S3
+            if (s3Client != null) {
+                DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(filename)
+                        .build();
+
+                s3Client.deleteObject(deleteObjectRequest);
+                System.out.println("Video successfully deleted from S3: " + filename);
+            }
+
+            // Step 5: Delete from MinIO
+            if (minioClient != null) {
+                minioClient.removeObject(
+                        io.minio.RemoveObjectArgs.builder()
+                                .bucket(bucketName)
+                                .object(filename)
+                                .build()
+                );
+                System.out.println("Video successfully deleted from MinIO: " + filename);
+            }
+
+            // Step 6: delete from metadata and user videos databases
+            videoMetaDataRepository.deleteById(videoId);
+            userVideoRepository.deleteByKeyUserIdAndKeyUploadTime(key.getUserId(), key.getUploadTime());
+
+            return "Video with ID: " + videoId + " successfully deleted for userId: " + userId;
+        } catch (Exception e) {
+            System.err.println("Failed to delete video with ID: " + videoId + " for userId: " + userId + " - " + e.getMessage());
+            return "Failed to delete video with ID: " + videoId + " for userId: " + userId + " - " + e.getMessage();
+        }
+    }
+
 
 
 

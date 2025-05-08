@@ -27,17 +27,16 @@ public class NewsFeedService {
      FAN-OUT-ON-WRITE --> normal users
      */
     List<String> followeesIds = Arrays.asList(
-           "e4eaaaf2-d142-11e1-b3e4-080027620cdd"
-//            ,
-//            "f91f9423-0f8e-4ea3-9bd7-c9d2c1c7639e",
-//            "4cdbd23e-4425-4c1d-8f16-871b21a379ce",
-//            "01f5c999-cc15-4f7a-bb9d-91e16c5eb9fb",
-//            "abed0a2a-fc63-4ea0-8c76-c77e68fc4cb3",
-//            "693a90ec-d7c2-49cc-8914-6cd205934c49",
-//            "eef74026-03a0-4e5a-8d0d-78800e8cb5c2",
-//            "908f9a15-62f7-4f92-8cb1-148b12e2d80f",
-//            "3e17453c-bc38-41cf-878f-2f51134b3c02",
-//            "53c2f5f3-5577-482b-a058-b56c0dc0ea9a"
+           "e4eaaaf2-d142-11e1-b3e4-080027620cdd",
+            "f91f9423-0f8e-4ea3-9bd7-c9d2c1c7639e",
+            "4cdbd23e-4425-4c1d-8f16-871b21a379ce",
+            "01f5c999-cc15-4f7a-bb9d-91e16c5eb9fb",
+            "abed0a2a-fc63-4ea0-8c76-c77e68fc4cb3",
+            "693a90ec-d7c2-49cc-8914-6cd205934c49",
+            "eef74026-03a0-4e5a-8d0d-78800e8cb5c2",
+            "908f9a15-62f7-4f92-8cb1-148b12e2d80f",
+            "3e17453c-bc38-41cf-878f-2f51134b3c02",
+            "53c2f5f3-5577-482b-a058-b56c0dc0ea9a"
     ); // fetched from follow service !!!!!!
 
     private final KafkaTemplate<String, FetchUserVideosEventRequest> kafkaTemplateRequest;
