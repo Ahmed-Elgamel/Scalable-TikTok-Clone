@@ -1,18 +1,18 @@
 package com.example.VideoService.service;
 
-import com.example.VideoService.VideoServiceApplication;
 import com.example.VideoService.dto.FetchUserVideosEventRequest;
 import com.example.VideoService.dto.FetchUserVideosEventResponse;
 import com.example.VideoService.dto.VideoDTO;
+import com.example.VideoService.model.UserSavedVideo;
 import com.example.VideoService.model.UserVideo;
 import com.example.VideoService.model.VideoMetaData;
+import com.example.VideoService.repository.UserSavedVideosRepository;
 import com.example.VideoService.repository.UserVideoRepository;
 import com.example.VideoService.repository.VideoMetaDataRepository;
 import io.minio.MinioClient;
 import io.minio.errors.MinioException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,6 +45,7 @@ public class VideoService {
     private final VideoMetaDataRepository videoMetaDataRepository;
     @Autowired
     private final UserVideoRepository userVideoRepository;
+    private final UserSavedVideosRepository userSavedVideosRepository;
     private final KafkaTemplate<String, String> kafkaVideoUploadTemplate;
     private final KafkaTemplate<String, FetchUserVideosEventResponse> kafkaUserVideosResponseTemplate;
     private static final String onVideoUploadTOPIC = "video-upload-events"; // Kafka topic to which we will send the event
@@ -54,9 +55,10 @@ public class VideoService {
     @Value("${minio.bucket}")
     private String bucketName;
 
-    public VideoService(S3Client s3Client, MinioClient minioClient, VideoMetaDataRepository videoMetaDataRepository, UserVideoRepository userVideoRepository, KafkaTemplate<String, String> kafkaVideoUploadTemplate, KafkaTemplate<String, FetchUserVideosEventResponse> kafkaUserVideosResponseTemplate) {
+    public VideoService(S3Client s3Client, MinioClient minioClient, VideoMetaDataRepository videoMetaDataRepository, UserVideoRepository userVideoRepository, UserSavedVideosRepository userSavedVideosRepository, KafkaTemplate<String, String> kafkaVideoUploadTemplate, KafkaTemplate<String, FetchUserVideosEventResponse> kafkaUserVideosResponseTemplate) {
         this.videoMetaDataRepository = videoMetaDataRepository;
         this.userVideoRepository = userVideoRepository;
+        this.userSavedVideosRepository = userSavedVideosRepository;
         this.kafkaVideoUploadTemplate = kafkaVideoUploadTemplate;
         this.kafkaUserVideosResponseTemplate = kafkaUserVideosResponseTemplate;
         this.s3Client = null;
@@ -293,6 +295,19 @@ public class VideoService {
 
         return "Video metadata successfully updated for videoId: " + videoId;
     }
+
+
+    public void saveVideoForUser(UUID userId, String videoId) {
+        Instant saveTime = Instant.now();
+
+        UserSavedVideo.UserSavedVideoKey key = new UserSavedVideo.UserSavedVideoKey(userId, saveTime);
+        UserSavedVideo savedVideo = new UserSavedVideo();
+        savedVideo.setKey(key);
+        savedVideo.setSavedVideoId(videoId);
+
+        userSavedVideosRepository.save(savedVideo);
+    }
+
 
 
 

@@ -76,6 +76,17 @@ public class VideoController {
         }
     }
 
+    @PostMapping("/saveVideo/{userId}/{videoId}")
+    public ResponseEntity<String> saveVideoForUser(@PathVariable String userId, @PathVariable String videoId) {
+        try {
+            videoService.saveVideoForUser(UUID.fromString(userId), videoId);
+            return ResponseEntity.ok("Video with ID: " + videoId + " was successfully saved for user: " + userId);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to save video for user: " + e.getMessage());
+        }
+    }
+
+
 
 
 
@@ -88,6 +99,9 @@ public class VideoController {
             return ResponseEntity.status(500).body("Seeding failed: " + e.getMessage());
         }
     }
+
+
+
 
 
 
