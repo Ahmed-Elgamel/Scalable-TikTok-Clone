@@ -22,6 +22,22 @@ public class UserSavedVideo {
             this.userId = userId;
             this.saveTime = saveTime;
         }
+
+        public UUID getUserId() {
+            return userId;
+        }
+
+        public void setUserId(UUID userId) {
+            this.userId = userId;
+        }
+
+        public Instant getSaveTime() {
+            return saveTime;
+        }
+
+        public void setSaveTime(Instant saveTime) {
+            this.saveTime = saveTime;
+        }
     }
 
     @PrimaryKey

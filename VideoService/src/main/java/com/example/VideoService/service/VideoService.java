@@ -5,8 +5,10 @@ import com.example.VideoService.dto.FetchUserVideosEventResponse;
 import com.example.VideoService.dto.VideoDTO;
 import com.example.VideoService.model.UserSavedVideo;
 import com.example.VideoService.model.UserVideo;
+import com.example.VideoService.model.UserVideoRating;
 import com.example.VideoService.model.VideoMetaData;
 import com.example.VideoService.repository.UserSavedVideosRepository;
+import com.example.VideoService.repository.UserVideoRatingRepository;
 import com.example.VideoService.repository.UserVideoRepository;
 import com.example.VideoService.repository.VideoMetaDataRepository;
 import io.minio.MinioClient;
@@ -46,6 +48,7 @@ public class VideoService {
     @Autowired
     private final UserVideoRepository userVideoRepository;
     private final UserSavedVideosRepository userSavedVideosRepository;
+    private final UserVideoRatingRepository userVideoRatingRepository;
     private final KafkaTemplate<String, String> kafkaVideoUploadTemplate;
     private final KafkaTemplate<String, FetchUserVideosEventResponse> kafkaUserVideosResponseTemplate;
     private static final String onVideoUploadTOPIC = "video-upload-events"; // Kafka topic to which we will send the event
@@ -55,10 +58,11 @@ public class VideoService {
     @Value("${minio.bucket}")
     private String bucketName;
 
-    public VideoService(S3Client s3Client, MinioClient minioClient, VideoMetaDataRepository videoMetaDataRepository, UserVideoRepository userVideoRepository, UserSavedVideosRepository userSavedVideosRepository, KafkaTemplate<String, String> kafkaVideoUploadTemplate, KafkaTemplate<String, FetchUserVideosEventResponse> kafkaUserVideosResponseTemplate) {
+    public VideoService(S3Client s3Client, MinioClient minioClient, VideoMetaDataRepository videoMetaDataRepository, UserVideoRepository userVideoRepository, UserSavedVideosRepository userSavedVideosRepository, UserVideoRatingRepository userVideoRatingRepository, KafkaTemplate<String, String> kafkaVideoUploadTemplate, KafkaTemplate<String, FetchUserVideosEventResponse> kafkaUserVideosResponseTemplate) {
         this.videoMetaDataRepository = videoMetaDataRepository;
         this.userVideoRepository = userVideoRepository;
         this.userSavedVideosRepository = userSavedVideosRepository;
+        this.userVideoRatingRepository = userVideoRatingRepository;
         this.kafkaVideoUploadTemplate = kafkaVideoUploadTemplate;
         this.kafkaUserVideosResponseTemplate = kafkaUserVideosResponseTemplate;
         this.s3Client = null;
@@ -308,6 +312,20 @@ public class VideoService {
         userSavedVideosRepository.save(savedVideo);
     }
 
+
+    public void rateVideo(UUID userId, String videoId, int rating) {
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5");
+        }
+
+        UserVideoRating.UserVideoRatingKey key = new UserVideoRating.UserVideoRatingKey(userId, videoId);
+        UserVideoRating userVideoRating = new UserVideoRating();
+        userVideoRating.setKey(key);
+        userVideoRating.setRating(rating);
+
+        userVideoRatingRepository.save(userVideoRating);
+        System.out.println("Successfully rated video with ID: " + videoId + " as " + rating + " by user: " + userId);
+    }
 
 
 

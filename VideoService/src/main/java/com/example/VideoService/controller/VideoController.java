@@ -76,7 +76,7 @@ public class VideoController {
         }
     }
 
-    @PostMapping("/saveVideo/{userId}/{videoId}")
+    @PostMapping("/save/{userId}/{videoId}")
     public ResponseEntity<String> saveVideoForUser(@PathVariable String userId, @PathVariable String videoId) {
         try {
             videoService.saveVideoForUser(UUID.fromString(userId), videoId);
@@ -85,6 +85,23 @@ public class VideoController {
             return ResponseEntity.status(500).body("Failed to save video for user: " + e.getMessage());
         }
     }
+
+    @PostMapping("/rate/{userId}/{videoId}")
+    public ResponseEntity<String> rateVideo(
+            @PathVariable String userId,
+            @PathVariable String videoId,
+            @RequestParam int rating) {
+        try {
+            videoService.rateVideo(UUID.fromString(userId), videoId, rating);
+            return ResponseEntity.ok("Video with ID: " + videoId + " was successfully rated as " + rating + " by user: " + userId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to rate video: " + e.getMessage());
+        }
+    }
+
+
 
 
 

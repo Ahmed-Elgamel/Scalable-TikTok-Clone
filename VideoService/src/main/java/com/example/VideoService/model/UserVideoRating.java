@@ -21,6 +21,22 @@ public class UserVideoRating {
             this.userId = userId;
             this.videoId = videoId;
         }
+
+        public UUID getUserId() {
+            return userId;
+        }
+
+        public void setUserId(UUID userId) {
+            this.userId = userId;
+        }
+
+        public String getVideoId() {
+            return videoId;
+        }
+
+        public void setVideoId(String videoId) {
+            this.videoId = videoId;
+        }
     }
 
     @PrimaryKey
@@ -29,5 +45,19 @@ public class UserVideoRating {
     @Column("rating")
     private int rating;
 
-    // Getters and Setters
+    public UserVideoRatingKey getKey() {
+        return key;
+    }
+
+    public void setKey(UserVideoRatingKey key) {
+        this.key = key;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
 }
