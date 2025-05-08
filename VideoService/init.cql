@@ -28,3 +28,12 @@ CREATE TABLE IF NOT EXISTS user_saved_videos (
     saved_video_id TEXT,
     PRIMARY KEY (user_id, save_time)
 ) WITH CLUSTERING ORDER BY (save_time DESC);
+
+
+-- Create Ratings Table
+CREATE TABLE IF NOT EXISTS user_video_ratings (
+    user_id UUID,
+    video_id TEXT,
+    rating INT,
+    PRIMARY KEY (user_id, video_id)
+);
