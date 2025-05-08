@@ -132,6 +132,8 @@ services:
       - mongodb-network
       - message-queue-network
       - cassandra-net
+    volumes:
+      - /Users/ahmedhamed/dev/scalable/FinalProject-31-A-PLUS-ISA/testMedia:/opt/videos
 #######################################################################################################################################
   newsfeed-ms:
     image: newsfeed-ms:latest

@@ -2,6 +2,7 @@ package com.example.VideoService.controller;
 
 import com.example.VideoService.dto.VideoDTO;
 
+import com.example.VideoService.seeder.DatabaseSeeder;
 import com.example.VideoService.service.VideoService;
 import io.minio.errors.MinioException;
 import org.springframework.http.HttpHeaders;
@@ -20,9 +21,11 @@ import java.time.Instant;
 public class VideoController {
 
     private final VideoService videoService;
+    private final DatabaseSeeder databaseSeeder;
 
-    public VideoController(VideoService videoService) {
+    public VideoController(VideoService videoService, DatabaseSeeder databaseSeeder) {
         this.videoService = videoService;
+        this.databaseSeeder = databaseSeeder;
     }
 
 
@@ -47,4 +50,18 @@ public class VideoController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(videoBytes);
     }
+
+    @PostMapping("/seed")
+    public ResponseEntity<String> seed() {
+        try {
+            System.out.println("3blablabbaballablablablbalbalbalbalbalbalbalblablablabalbalbalbalbalbalbalbalbalablablablabalbalbalbalablablabalbalbalablablabalbalbalbal");
+            String response = databaseSeeder.seedVideos();  // If you want this to return something, you should change it
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Seeding failed: " + e.getMessage());
+        }
+    }
+
+
+
 }

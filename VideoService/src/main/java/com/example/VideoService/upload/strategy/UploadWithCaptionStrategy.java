@@ -31,7 +31,6 @@ public class UploadWithCaptionStrategy implements UploadStrategy{
             videoDTO.setUploadTime(Instant.now());
 
         double duration = FFmpegVideoDurationUtil.getVideoDuration(videoFile);
-        System.out.println("durationnnnnnnnnnnnnnnnnnnnnnnmnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn: "+duration);
 
 
         VideoMetaData videoMetaData = new VideoMetaData.Builder()

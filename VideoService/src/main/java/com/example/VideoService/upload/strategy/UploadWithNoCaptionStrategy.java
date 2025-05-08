@@ -28,7 +28,6 @@ public class UploadWithNoCaptionStrategy implements UploadStrategy{
     public VideoMetaData saveVideoMetaData(VideoDTO videoDTO, MultipartFile videoFile) {
 
         double duration = FFmpegVideoDurationUtil.getVideoDuration(videoFile);
-        System.out.println("durationnnnnnnnnnnnnnnnnnnnnnnmnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn: "+duration);
 
 
         VideoMetaData videoMetaData = new VideoMetaData.Builder()
