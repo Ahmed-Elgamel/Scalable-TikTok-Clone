@@ -64,6 +64,18 @@ public class VideoController {
         }
     }
 
+    @PatchMapping("/{userId}/{videoId}")
+    public ResponseEntity<String> updateVideoMetaData(@PathVariable String userId,
+                                                      @PathVariable String videoId,
+                                                      @RequestBody VideoDTO videoDTO) {
+        try {
+            videoService.updateVideoMetaData(UUID.fromString(userId), videoId, videoDTO);  // Assuming this method exists
+            return ResponseEntity.ok("Video metadata for ID: " + videoId + " was successfully updated.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to update video metadata: " + e.getMessage());
+        }
+    }
+
 
 
 

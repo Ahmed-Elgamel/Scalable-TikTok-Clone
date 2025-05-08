@@ -5,12 +5,14 @@ import com.example.VideoService.dto.FetchUserVideosEventRequest;
 import com.example.VideoService.dto.FetchUserVideosEventResponse;
 import com.example.VideoService.dto.VideoDTO;
 import com.example.VideoService.model.UserVideo;
+import com.example.VideoService.model.VideoMetaData;
 import com.example.VideoService.repository.UserVideoRepository;
 import com.example.VideoService.repository.VideoMetaDataRepository;
 import io.minio.MinioClient;
 import io.minio.errors.MinioException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import com.example.VideoService.upload.strategy.UploadWithCaptionStrategy;
 import com.example.VideoService.upload.strategy.UploadWithNoCaptionStrategy;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -242,6 +245,53 @@ public class VideoService {
             System.err.println("Failed to delete video with ID: " + videoId + " for userId: " + userId + " - " + e.getMessage());
             return "Failed to delete video with ID: " + videoId + " for userId: " + userId + " - " + e.getMessage();
         }
+    }
+
+    public String updateVideoMetaData(UUID userId, String videoId, VideoDTO videoDTO) throws Exception {
+        List<UserVideo> videos = userVideoRepository.findByKeyUserId(userId);
+
+        UserVideo videoToUpdate = videos.stream()
+                .filter(video -> video.getVideoId().equals(videoId))
+                .findFirst().orElseThrow(
+                        () -> new Exception("Video not found for userId: " + userId + " and videoId: " + videoId)
+                );
+
+
+        VideoMetaData videoMetaData = videoMetaDataRepository.findById(videoId).orElseThrow(
+                () -> new Exception("Video MetaData not found")
+        );
+        // enumerate alll the fields found in videDTO and update uservideos table and video metadat table and save them again
+        // use Reflection-based loop for updating fields
+        Field[] fields = VideoDTO.class.getDeclaredFields();
+        for (Field field : fields) {
+            field.setAccessible(true); // Allow access to private fields
+            Object value = field.get(videoDTO);
+
+            // Skip if value is null
+            if (value == null) {
+                continue;
+            }
+
+            // Update UserVideo and VideoMetaData dynamically
+            try {
+                Field userVideoField = UserVideo.class.getDeclaredField(field.getName());
+                userVideoField.setAccessible(true);
+                userVideoField.set(videoToUpdate, value);
+
+                Field videoMetaDataField = VideoMetaData.class.getDeclaredField(field.getName());
+                videoMetaDataField.setAccessible(true);
+                videoMetaDataField.set(videoMetaData, value);
+
+            } catch (NoSuchFieldException e) {
+                System.out.println("Field " + field.getName() + " not found in UserVideo or VideoMetaData. Skipping...");
+            }
+        }
+
+        // Save the updated entities
+        userVideoRepository.save(videoToUpdate);
+        videoMetaDataRepository.save(videoMetaData);
+
+        return "Video metadata successfully updated for videoId: " + videoId;
     }
 
 
