@@ -37,7 +37,7 @@ public class UploadWithCaptionStrategy implements UploadStrategy{
                 .videoId(videoDTO.getVideoId())
                 .caption(videoDTO.getCaption())
                 .sizeBytes(videoFile.getSize())
-                .durationSeconds(duration)  //todo  note: this needs an external library like FFMPEG for example
+                .durationSeconds(duration)
                 .processedAt(Instant.now())
                 .bucketName(videoDTO.getBucketName())
                 .build();

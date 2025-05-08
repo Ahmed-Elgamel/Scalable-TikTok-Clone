@@ -19,3 +19,12 @@ CREATE TABLE IF NOT EXISTS user_videos (
   tags LIST<TEXT>,          -- list of tags of the video
   PRIMARY KEY ((user_id), upload_time)
 ) WITH CLUSTERING ORDER BY (upload_time DESC);
+
+
+-- Create Saved Videos Table
+CREATE TABLE IF NOT EXISTS user_saved_videos (
+    user_id UUID,
+    save_time TIMESTAMP,
+    saved_video_id TEXT,
+    PRIMARY KEY (user_id, save_time)
+) WITH CLUSTERING ORDER BY (save_time DESC);

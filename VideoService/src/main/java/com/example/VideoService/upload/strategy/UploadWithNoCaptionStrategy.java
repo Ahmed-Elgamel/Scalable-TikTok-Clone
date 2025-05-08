@@ -33,7 +33,7 @@ public class UploadWithNoCaptionStrategy implements UploadStrategy{
         VideoMetaData videoMetaData = new VideoMetaData.Builder()
                 .videoId(videoDTO.getVideoId())
                 .sizeBytes(videoFile.getSize())
-                .durationSeconds(duration)  //todo  note: this needs an external library like FFMPEG for example
+                .durationSeconds(duration)
                 .processedAt(Instant.now())
                 .bucketName(videoDTO.getBucketName())
                 .build();
