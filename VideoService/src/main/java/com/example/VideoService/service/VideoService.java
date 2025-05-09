@@ -187,12 +187,8 @@ public class VideoService {
                 userVideos                                  // uploaded videos of this userId
                 );
 
-        for(VideoDTO videoDTO: fetchUserVideosEventResponse.getVideos()){
-            System.out.println(videoDTO.getVideoId()+ " this is the video id bitchhhhhhhh");
-        }
 
         String replyTopic = fetchUserVideosEventRequest.getReplyTopic();
-
         kafkaUserVideosResponseTemplate.send(replyTopic, fetchUserVideosEventResponse);
 
 
@@ -245,6 +241,8 @@ public class VideoService {
             // Step 6: delete from metadata and user videos databases
             videoMetaDataRepository.deleteById(videoId);
             userVideoRepository.deleteByKeyUserIdAndKeyUploadTime(key.getUserId(), key.getUploadTime());
+
+            // todo: publish video deleted event in order for newsfeed service to update
 
             return "Video with ID: " + videoId + " successfully deleted for userId: " + userId;
         } catch (Exception e) {

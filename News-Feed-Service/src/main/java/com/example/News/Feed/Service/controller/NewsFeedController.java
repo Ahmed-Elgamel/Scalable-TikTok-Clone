@@ -1,13 +1,12 @@
 package com.example.News.Feed.Service.controller;
 
 import com.example.News.Feed.Service.dto.FeedDTO;
+import com.example.News.Feed.Service.dto.FilterRequestDTO;
 import com.example.News.Feed.Service.service.NewsFeedService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -22,10 +21,24 @@ public class NewsFeedController {
 
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<FeedDTO>> getNewsFeed(@PathVariable String userId) {
-        List<FeedDTO> feedDTOS = newsFeedService.buildNewsFeed(userId);
-        return ResponseEntity.ok(feedDTOS);
+    public ResponseEntity<FeedDTO> getNewsFeed(@PathVariable String userId) {
+        FeedDTO feedDTO = newsFeedService.buildNewsFeed(userId);
+        return ResponseEntity.ok(feedDTO);
     }
+
+
+    @PostMapping("/filter/{userId}")
+    public ResponseEntity<FeedDTO> filterNewsfeed(@PathVariable String userId,
+                                                  @RequestBody FilterRequestDTO filterRequest) {
+        FeedDTO feedDTO = null;
+        try {
+            feedDTO = newsFeedService.filterNewsFeed(userId, filterRequest);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return ResponseEntity.ok(feedDTO);
+    }
+
 
 
 

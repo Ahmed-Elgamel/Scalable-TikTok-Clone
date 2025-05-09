@@ -1,15 +1,20 @@
 package com.example.News.Feed.Service.service;
 
 import com.example.News.Feed.Service.dto.*;
+import com.example.News.Feed.Service.filter.FilterByDurationCommand;
+import com.example.News.Feed.Service.filter.NewsFeedFilterCommand;
 import com.example.News.Feed.Service.model.FeedItem;
 import com.example.News.Feed.Service.repository.FeedItemRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,7 +67,7 @@ public class NewsFeedService {
     }
 
 
-    public List<FeedDTO> buildNewsFeed(String userId){
+    public FeedDTO buildNewsFeed(String userId){
         // see if there is something in cache if yes return it
         // if not then get all the users this user follows (followees/followings)
         // then get all their uploaded videos
@@ -79,6 +84,21 @@ public class NewsFeedService {
 
         return null;
     }
+
+
+    public FeedDTO filterNewsFeed(String userId, FilterRequestDTO filterRequestDTO) throws IOException {
+        NewsFeedFilterCommand newsFeedFilterCommand;
+        FeedDTO feedDTO = null;
+
+        if(filterRequestDTO.getDurationSeconds() != null){
+            newsFeedFilterCommand = new FilterByDurationCommand(userId, feedCacheService, filterRequestDTO);
+            feedDTO = newsFeedFilterCommand.execute();
+
+        }
+        return feedDTO;
+    }
+
+
 
     @KafkaListener(topics = "video-upload-events", groupId = "newsfeed-group") // use a FLINK NODE instead of this function?
     public void handleVideoUploaded(String message) throws JsonProcessingException {
@@ -109,7 +129,7 @@ public class NewsFeedService {
                     groupId = "newsfeed-videos-consumer-group",
                     containerFactory = "fetchUserVideosKafkaListenerFactory"
                     ) // use a FLINK NODE instead of this function?
-    public void consumeFetchUserVideosEventResponse(FetchUserVideosEventResponse fetchUserVideosEventResponse){
+    public void consumeFetchUserVideosEventResponse(FetchUserVideosEventResponse fetchUserVideosEventResponse) throws IOException {
         // update newsfeed cache and database!!
         System.out.println("****************************Received the focken videos of the followee****************************");
         List<FeedItem> feedItems = fetchUserVideosEventResponse.getVideos().stream().
@@ -155,16 +175,22 @@ public class NewsFeedService {
         updatedFeedOfTargetUser.addAll(newFeedVideos);  // add new videos to the list
 
         // remove duplicates based on videoId
-        Map<String, VideoDTO> deduplicated = new LinkedHashMap<>();
-        for (VideoDTO video : updatedFeedOfTargetUser) {
-            deduplicated.put(video.getVideoId(), video);
-        }
-        List<VideoDTO> finalFeed = new ArrayList<>(deduplicated.values()); // now we have the final feed
+       HashSet<String> videoIdsMap = new HashSet<>();
+       List<VideoDTO> finalFeed = new ArrayList<>();// this will have the final feed
+
+       for(VideoDTO videoDTO: updatedFeedOfTargetUser){
+           String videoId = videoDTO.getVideoId();
+
+           if(!videoIdsMap.contains(videoId)){ // only add unseen videos
+               finalFeed.add(videoDTO);
+               videoIdsMap.add(videoId);
+           }
+       }
 
         // Sort needed because it is a feed
         finalFeed.sort(Comparator.comparing(VideoDTO::getUploadTime).reversed());
-
-        feedCacheService.cacheFeedItems(targetUserId, finalFeed); // finally store the new feed of target usr in cache
+        // finally store the new feed of target usr in cache
+        feedCacheService.cacheFeedItems(targetUserId, finalFeed);
 
     }
 

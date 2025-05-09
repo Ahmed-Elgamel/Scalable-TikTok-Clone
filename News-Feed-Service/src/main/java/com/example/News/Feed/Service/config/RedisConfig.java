@@ -1,6 +1,8 @@
 package com.example.News.Feed.Service.config;
 
+import com.example.News.Feed.Service.dto.VideoDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +16,7 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.util.List;
 
 @Configuration
 public class RedisConfig {
@@ -36,17 +39,13 @@ public class RedisConfig {
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
+        template.setConnectionFactory(redisConnectionFactory());
 
-        // Jackson serializer setup for consistency with the cache configuration
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
-
-        // Set up serializers for key and value
+        // Use StringRedisSerializer for keys
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(serializer);  // Consistent with the cache config
-        template.setHashValueSerializer(serializer);
+
+        // Use GenericJackson2JsonRedisSerializer for values
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
 
         return template;
     }
