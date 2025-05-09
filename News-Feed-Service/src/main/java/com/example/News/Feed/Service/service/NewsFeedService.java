@@ -2,6 +2,7 @@ package com.example.News.Feed.Service.service;
 
 import com.example.News.Feed.Service.dto.*;
 import com.example.News.Feed.Service.filter.FilterByDurationCommand;
+import com.example.News.Feed.Service.filter.FilterByTagCommand;
 import com.example.News.Feed.Service.filter.NewsFeedFilterCommand;
 import com.example.News.Feed.Service.model.FeedItem;
 import com.example.News.Feed.Service.repository.FeedItemRepository;
@@ -92,6 +93,11 @@ public class NewsFeedService {
 
         if(filterRequestDTO.getDurationSeconds() != null){
             newsFeedFilterCommand = new FilterByDurationCommand(userId, feedCacheService, filterRequestDTO);
+            feedDTO = newsFeedFilterCommand.execute();
+
+        }
+        if(filterRequestDTO.getTags() != null){
+            newsFeedFilterCommand = new FilterByTagCommand(userId, feedCacheService, filterRequestDTO);
             feedDTO = newsFeedFilterCommand.execute();
 
         }

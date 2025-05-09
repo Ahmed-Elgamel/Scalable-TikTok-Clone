@@ -1,17 +1,17 @@
 package com.example.News.Feed.Service.dto;
 
-import javax.xml.crypto.dom.DOMCryptoContext;
+import java.util.List;
 
 public class FilterRequestDTO {
-    private String tag;
+    private List<String> tags;
     private Double durationSeconds;
 
-    public String getTag() {
-        return tag;
+    public List<String> getTags() {
+        return tags;
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
+    public void setTags( List<String> tags) {
+        this.tags = tags;
     }
 
     public Double getDurationSeconds() {
