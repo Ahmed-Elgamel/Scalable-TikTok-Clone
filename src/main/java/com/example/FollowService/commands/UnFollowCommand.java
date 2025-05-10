@@ -1,21 +1,20 @@
 package com.example.FollowService.commands;
 
-public class FollowCommand implements command{
+public class UnFollowCommand implements command{
     private final String followerId;
     private final String followeeId;
 
-    public FollowCommand(String followerId, String followeeId) {
+    public UnFollowCommand(String followerId, String followeeId) {
         this.followerId = followerId;
         this.followeeId = followeeId;
     }
 
-    public String getFollowerId() {
-        return followerId;
-    }
-
-
     public String getFolloweeId() {
         return followeeId;
+    }
+
+    public String getFollowerId() {
+        return followerId;
     }
 
     @Override

@@ -1,21 +1,22 @@
 package com.example.FollowService.commands;
 
-public class FollowCommand implements command{
-    private final String followerId;
+import java.util.Date;
+
+public class FilterByDateCommand implements command{
     private final String followeeId;
+    private final Date date;
 
-    public FollowCommand(String followerId, String followeeId) {
-        this.followerId = followerId;
+    public FilterByDateCommand(String followeeId, Date date) {
         this.followeeId = followeeId;
+        this.date = date;
     }
-
-    public String getFollowerId() {
-        return followerId;
-    }
-
 
     public String getFolloweeId() {
         return followeeId;
+    }
+
+    public Date getDate() {
+        return date;
     }
 
     @Override
