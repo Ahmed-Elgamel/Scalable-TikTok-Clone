@@ -15,31 +15,36 @@ services:
     ports:
       - "9042:9042"
     environment:
-#      - CASSANDRA_USER=admin
-#      - CASSANDRA_PASSWORD=admin
       - MAX_HEAP_SIZE=4G
       - HEAP_NEWSIZE=800M
-#      - CASSANDRA_CLUSTER_NAME=NewsfeedCluster
       - CASSANDRA_DC=datacenter1
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
-#      - CASSANDRA_BROADCAST_ADDRESS=cassandra  # or the container hostname
-#      - CASSANDRA_LISTEN_ADDRESS=cassandra
-#      - CASSANDRA_RPC_ADDRESS=0.0.0.0
     volumes:
       - cassandra_data:/var/lib/cassandra
     networks:
       - cassandra-net
+    healthcheck:
+      test: [ "CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 #######################################################################################################################################
   cassandra-init:
     image: cassandra:latest
     depends_on:
-      - cassandra
+        cassandra:
+          condition: service_healthy
     volumes:
       - ./News-Feed-Service/init.cql:/init_news.cql
       - ./VideoService/init.cql:/init_video.cql
     entrypoint: [ "sh", "-c", "sleep 30 && cqlsh cassandra -f /init_news.cql && cqlsh cassandra -f /init_video.cql" ]
     networks:
       - cassandra-net
+    healthcheck:
+      test: [ "CMD", "cqlsh", "cassandra", "-e", "DESCRIBE KEYSPACES" ]
+      interval: 10s
+      retries: 10
+      timeout: 5s
 #######################################################################################################################################
   zookeeper:
     image: bitnami/zookeeper:latest
@@ -123,10 +128,14 @@ services:
       MINIO_ROOT_PASSWORD: minio123
       MINIO_ENDPOINT: http://minio:9000
     depends_on:
-      - minio
-      - kafka
-      - cassandra
-      - cassandra-init
+      minio:
+        condition: service_started
+      kafka:
+        condition: service_started
+      cassandra:
+        condition: service_started
+      cassandra-init:
+        condition: service_healthy
     networks:
       - minio-network
       - mongodb-network
@@ -151,10 +160,15 @@ services:
 #      SPRING_REDIS_HOST: redis-server
 #      SPRING_REDIS_PORT: 6379
     depends_on:
-      - kafka
-      - cassandra
-      - cassandra-init
-      - redis
+      kafka:
+        condition: service_started
+      cassandra:
+        condition: service_started
+      cassandra-init:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
     networks:
       - message-queue-network
       - cassandra-net
