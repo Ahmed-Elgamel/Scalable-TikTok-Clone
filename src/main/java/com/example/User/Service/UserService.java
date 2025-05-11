@@ -60,7 +60,7 @@ public class UserService {
         if (user != null) {
             user.setActive(true);
             userRepository.save(user);
-            return ResponseEntity.ok("User activated successfully!");
+            return ResponseEntity.ok("User activated successfully");
         }
         return ResponseEntity.notFound().build();
     }
@@ -70,7 +70,7 @@ public class UserService {
         if (user != null) {
             user.setActive(false);
             userRepository.save(user);
-            return ResponseEntity.ok("User deactivated successfully!");
+            return ResponseEntity.ok("User deactivated successfully");
         }
         return ResponseEntity.notFound().build();
     }
@@ -88,13 +88,13 @@ public class UserService {
     public ResponseEntity<String> login(String email, String password) {
         User user = userRepository.findByEmail(email);
         if (user != null && passwordEncoder.matches(password, user.getPassword())) { // Verify password
-            return ResponseEntity.ok("Login successful!");
+            return ResponseEntity.ok("Login successful");
         }  else {
             return ResponseEntity.status(401).body("Invalid email or password");
         }
     }
 
     public ResponseEntity<String> logout() {
-        return ResponseEntity.ok("Logout successful!");
+        return ResponseEntity.ok("Logout successful");
     }
 }

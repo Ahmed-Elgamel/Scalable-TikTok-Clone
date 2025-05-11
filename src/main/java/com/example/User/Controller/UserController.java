@@ -4,6 +4,7 @@ import com.example.User.DesignPattern.Command.CommandInvoker;
 import com.example.User.DesignPattern.Command.LoginCommand;
 import com.example.User.DesignPattern.Command.LogoutCommand;
 import com.example.User.Model.User;
+import com.example.User.Security.JwtUtil;
 import com.example.User.Service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +17,12 @@ public class UserController {
 
     private final CommandInvoker commandInvoker;
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
-    public UserController(UserService userService, CommandInvoker commandInvoker) {
+    public UserController(UserService userService, CommandInvoker commandInvoker, JwtUtil jwtUtil) {
         this.userService = userService;
         this.commandInvoker = commandInvoker;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/addUser")
@@ -60,7 +63,14 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody User user) {
         commandInvoker.setCommand(new LoginCommand(userService, user.getEmail(), user.getPassword()));
-        return ResponseEntity.ok(commandInvoker.executeCommand());
+        String result = commandInvoker.executeCommand();
+        if (result.equalsIgnoreCase("Login successful")) {
+            String token = jwtUtil.generateToken(user.getEmail());
+            return ResponseEntity.ok("Bearer " + token);
+        }
+        else {
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
     }
 
     @PostMapping("/logout")
