@@ -52,9 +52,7 @@ public class UserService {
             userRepository.save(existingUser);
             return ResponseEntity.ok("User updated successfully!");
         }
-        else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.notFound().build();
     }
 
     public ResponseEntity<String> activateUser(Long id) {
