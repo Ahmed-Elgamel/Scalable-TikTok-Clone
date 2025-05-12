@@ -1,12 +1,18 @@
 package com.example.FollowService.commands;
 
+import com.example.FollowService.Service.FollowService;
+import org.springframework.beans.factory.annotation.Autowired;
+
 public class FollowCommand implements command{
     private final String followerId;
     private final String followeeId;
+    @Autowired
+    private final FollowService followService;
 
-    public FollowCommand(String followerId, String followeeId) {
+    public FollowCommand(String followerId, String followeeId,FollowService followService) {
         this.followerId = followerId;
         this.followeeId = followeeId;
+        this.followService=followService;
     }
 
     public String getFollowerId() {
@@ -20,6 +26,6 @@ public class FollowCommand implements command{
 
     @Override
     public void execute() {
-        return;
+        followService.handleFollowCommand(this.followeeId,this.followerId);
     }
 }

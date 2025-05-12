@@ -4,11 +4,13 @@ import com.example.FollowService.Model.Follow;
 import com.example.FollowService.Repository.FollowRepository;
 import com.example.FollowService.commands.FollowCommand;
 import com.example.FollowService.commands.UnFollowCommand;
+import com.example.FollowService.strategy.FilterByDateStrategy;
+import com.example.FollowService.strategy.FilterByMutalFollowersStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
+
+import java.util.*;
 
 @Service
 public class FollowService {
@@ -24,17 +26,89 @@ public class FollowService {
     public List<Follow> getFollowers(String followeeId){
         return followRepository.findByFolloweeId(followeeId);
     }
-    public Follow handleFollowCommand(FollowCommand command){
-        Follow new_follow=new Follow(command.getFollowerId(),command.getFolloweeId(),new Date());
+    public Follow handleFollowCommand(String followerId,String followeeId){
+        Follow new_follow=new Follow(followerId,followeeId,new Date());
         return followRepository.save(new_follow);
     }
-    public Follow handleUnFollowCommand(UnFollowCommand command){
-        Follow follow=followRepository.findByFolloweeIdAndFollowerId(command.getFolloweeId(), command.getFollowerId());
-        if(follow!=null){
+    public Follow handleUnFollowCommand(String followerId,String followeeId){
+        Follow follow=followRepository.findByFollowerIdAndFolloweeId(followerId,followeeId)
+                .orElseThrow(() -> new NoSuchElementException("Follow relationship not found"));;
             followRepository.delete(follow);
-        }else{
-            System.out.println("Follow Not found");
-        }
+
         return follow;
     }
+
+    public void handleUnMuteCommand(String followerId, String followeeId) {
+        Follow follow = followRepository.findByFollowerIdAndFolloweeId(followerId, followeeId)
+                .orElseThrow(() -> new NoSuchElementException("Follow relationship not found"));
+
+        follow.setMuted(false);
+        followRepository.save(follow);
+
+    }
+
+    public void handleMuteCommand(String followerId, String followeeId) {
+        Follow follow = followRepository.findByFollowerIdAndFolloweeId(followerId, followeeId)
+                .orElseThrow(() -> new NoSuchElementException("Follow relationship not found"));
+
+        follow.setMuted(true);
+        followRepository.save(follow);
+    }
+
+    public List<String> getMutualFollowers(String user1, String user2) {
+        List<Follow> followers1=getFollowers(user1);
+        List<Follow> followers2=getFollowers(user2);
+        Set<String> followersSet1 = new HashSet<>();
+        for (Follow follow : followers1) {
+            followersSet1.add(follow.getFollowerId());
+        }
+
+        Set<String> mutualUsers = new HashSet<>();
+        for (Follow follow : followers2) {
+            if (followersSet1.contains(follow.getFollowerId())) {
+                mutualUsers.add(follow.getFollowerId());
+            }
+        }
+
+        return new ArrayList<>(mutualUsers);
+
+        }
+
+    public List<String> getFollowersFilteredByDate(String followee,Date date){
+        FilterByDateStrategy byDateStrategy=new FilterByDateStrategy(date);
+        List<Follow> followers=getFollowers(followee);
+        return byDateStrategy.filter(followers);
+    }
+    public List<String> getFollowersFilteredByNumOfMutuals(String followee,Integer numOfMutuals){
+        FilterByMutalFollowersStrategy byMutalFollowersStrategy=new FilterByMutalFollowersStrategy(followee,numOfMutuals,this);
+        List<Follow> followers=getFollowers(followee);
+        if (followers.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return byMutalFollowersStrategy.filter(followers);
+    }
 }
+//
+//        List<String> user1FollowerIds = user1Followers.stream()
+//                .map(Follow::getFollowerId)
+//                .collect(Collectors.toList());
+//
+//        List<String> user2FollowerIds = user2Followers.stream()
+//                .map(Follow::getFollowerId)
+//                .collect(Collectors.toList());
+//
+//        // Find intersection of user1's and user2's followers
+//        user1FollowerIds.retainAll(user2FollowerIds);
+//
+//        return user1FollowerIds;
+
+
+//        List<String> mutual_users=new ArrayList<>();
+//        for(int i=0;i<followers1.size();i++) {
+//            for(int j=0;j<followers2.size();j++){
+//                if(followers1.get(i).getFollowerId().equals(followers2.get(j).getFollowerId()))
+//                    mutual_users.add(followers1.get(i).getFollowerId());
+//            }
+//        }
+//        return mutual_users;
+

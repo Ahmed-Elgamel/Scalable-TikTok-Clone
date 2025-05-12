@@ -9,18 +9,28 @@ import java.util.Date;
 public class Follow {
     @Id
     private String id;
-
-    private String followerId;
     private String followeeId;
+    private String followerId;
+
     private Date followedAt;
+    private boolean muted;
 
     public Follow() {
     }
 
-    public Follow(String followerId, String followeeId, Date followedAt) {
+    public Follow( String followerId,String followeeId, Date followedAt) {
         this.followerId = followerId;
         this.followeeId = followeeId;
         this.followedAt = followedAt;
+        muted=false;
+    }
+
+    public boolean isMuted() {
+        return muted;
+    }
+
+    public void setMuted(boolean muted) {
+        this.muted = muted;
     }
 
     public String getFollowerId() {

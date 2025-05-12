@@ -4,8 +4,9 @@ import com.example.FollowService.Model.Follow;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FollowRepository extends MongoRepository<Follow, String> {
     List<Follow> findByFolloweeId(String followeeId);
-    Follow findByFolloweeIdAndFollowerId(String followeeId,String followerId);
+    Optional<Follow> findByFollowerIdAndFolloweeId(String followerId, String followeeId);
 }
