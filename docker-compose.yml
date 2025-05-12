@@ -174,10 +174,41 @@ services:
       - cassandra-net
       - redis-net
 #######################################################################################################################################
+  user-ms:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: user-ms-container
+    networks:
+      - user-service-network
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/user
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
+    ports:
+      - "8080:8080"
+  #######################################################################################################################################
+  postgres:
+    image: postgres
+    container_name: postgres_db
+    networks:
+      - app-network
+    environment:
+      POSTGRES_DB: user
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+#######################################################################################################################################
 volumes:
   minio_data:
   mongodb_data:
   cassandra_data:
+  postgres_data:
 #######################################################################################################################################
 networks:
   minio-network:
@@ -190,6 +221,10 @@ networks:
     driver: bridge
   redis-net:
     driver: bridge
+  user-service-network:
+    driver: bridge
 
 
 
+
+ 
