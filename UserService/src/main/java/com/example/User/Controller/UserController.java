@@ -73,9 +73,9 @@ public class UserController {
         }
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
-        commandInvoker.setCommand(new LogoutCommand(userService));
-        return ResponseEntity.ok(commandInvoker.executeCommand());
-    }
+//    @PostMapping("/logout")
+//    public ResponseEntity<String> logout() {
+//        commandInvoker.setCommand(new LogoutCommand(userService));
+//        return ResponseEntity.ok(commandInvoker.executeCommand());
+//    }
 }
