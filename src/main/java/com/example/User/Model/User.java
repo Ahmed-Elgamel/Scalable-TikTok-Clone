@@ -87,6 +87,11 @@ public class User {
         private String password;
         private boolean isActive;
 
+        public UserBuilder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
         public UserBuilder username(String username) {
             this.username = username;
             return this;
