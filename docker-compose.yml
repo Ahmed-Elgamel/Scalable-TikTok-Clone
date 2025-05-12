@@ -176,7 +176,7 @@ services:
 #######################################################################################################################################
   user-ms:
     build:
-      context: .
+      context: ./UserService
       dockerfile: Dockerfile
     container_name: user-ms-container
     networks:
@@ -188,13 +188,13 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 1234
     ports:
-      - "8080:8080"
+      - "8083:8080"
   #######################################################################################################################################
   postgres:
     image: postgres
     container_name: postgres_db
     networks:
-      - app-network
+      - user-service-network
     environment:
       POSTGRES_DB: user
       POSTGRES_USER: postgres
