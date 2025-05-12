@@ -19,7 +19,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public String addUser(User user) {
+    public ResponseEntity<String> addUser(User user) {
         User newUser = new User.UserBuilder()
                 .username(user.getUsername())
                 .email(user.getEmail())
@@ -28,7 +28,7 @@ public class UserService {
                 .build();
 
         userRepository.save(newUser);
-        return "User created successfully";
+        return ResponseEntity.ok("User added successfully");
     }
 
     public ResponseEntity<User> getUser(Long id) {
