@@ -30,29 +30,39 @@ public class UserController {
         return userService.addUser(user);
     }
 
-    @GetMapping("/getUser/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id){
-        return userService.getUser(id);
+    @GetMapping("/getUser")
+    public ResponseEntity<User> getUser(@RequestHeader("Authorization") String authHeader){
+        String token = authHeader.substring(7);
+        Long userId = jwtUtil.extractUserId(token);
+        return userService.getUser(userId);
     }
 
-    @DeleteMapping("/deleteUser/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id){
-        return userService.deleteUser(id);
+    @DeleteMapping("/deleteUser")
+    public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String authHeader){
+        String token = authHeader.substring(7);
+        Long userId = jwtUtil.extractUserId(token);
+        return userService.deleteUser(userId);
     }
 
-    @PutMapping("/updateUser/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody User user){
-        return userService.updateUser(id, user);
+    @PutMapping("/updateUser")
+    public ResponseEntity<String> updateUser(@RequestHeader("Authorization") String authHeader, @RequestBody User user){
+        String token = authHeader.substring(7);
+        Long userId = jwtUtil.extractUserId(token);
+        return userService.updateUser(userId, user);
     }
 
-    @PutMapping("/activateUser/{id}")
-    public ResponseEntity<String> activateUser(@PathVariable Long id){
-        return userService.activateUser(id);
+    @PutMapping("/activateUser")
+    public ResponseEntity<String> activateUser(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Long userId = jwtUtil.extractUserId(token);
+        return userService.activateUser(userId);
     }
 
-    @PutMapping("/deactivateUser/{id}")
-    public ResponseEntity<String> deactivateUser(@PathVariable Long id){
-        return userService.deactivateUser(id);
+    @PutMapping("/deactivateUser")
+    public ResponseEntity<String> deactivateUser(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Long userId = jwtUtil.extractUserId(token);
+        return userService.deactivateUser(userId);
     }
 
     @GetMapping("/findByUsername")
@@ -65,7 +75,8 @@ public class UserController {
         commandInvoker.setCommand(new LoginCommand(userService, user.getEmail(), user.getPassword()));
         String result = commandInvoker.executeCommand();
         if (result.equalsIgnoreCase("Login successful")) {
-            String token = jwtUtil.generateToken(user.getEmail());
+            User existingUser = userService.findByEmail(user.getEmail());
+            String token = jwtUtil.generateToken(existingUser.getId());
             return ResponseEntity.ok("Bearer " + token);
         }
         else {
@@ -73,9 +84,9 @@ public class UserController {
         }
     }
 
-//    @PostMapping("/logout")
-//    public ResponseEntity<String> logout() {
-//        commandInvoker.setCommand(new LogoutCommand(userService));
-//        return ResponseEntity.ok(commandInvoker.executeCommand());
-//    }
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout() {
+        commandInvoker.setCommand(new LogoutCommand(userService));
+        return ResponseEntity.ok(commandInvoker.executeCommand());
+    }
 }

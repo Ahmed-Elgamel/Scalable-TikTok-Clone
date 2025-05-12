@@ -41,6 +41,10 @@ public class UserService {
         }
     }
 
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
     public ResponseEntity<String> deleteUser(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
