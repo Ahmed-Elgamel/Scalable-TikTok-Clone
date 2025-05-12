@@ -1,4 +1,4 @@
-package com.example.User.DesignPattern.Command;
+package com.example.User.Command;
 
 public interface Command {
     String execute();

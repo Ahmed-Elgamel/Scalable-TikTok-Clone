@@ -1,8 +1,8 @@
 package com.example.User.Controller;
 
-import com.example.User.DesignPattern.Command.CommandInvoker;
-import com.example.User.DesignPattern.Command.LoginCommand;
-import com.example.User.DesignPattern.Command.LogoutCommand;
+import com.example.User.Command.CommandInvoker;
+import com.example.User.Command.LoginCommand;
+import com.example.User.Command.LogoutCommand;
 import com.example.User.Model.User;
 import com.example.User.Security.JwtUtil;
 import com.example.User.Service.UserService;

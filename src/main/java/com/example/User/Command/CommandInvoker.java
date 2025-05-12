@@ -1,4 +1,4 @@
-package com.example.User.DesignPattern.Command;
+package com.example.User.Command;
 
 import org.springframework.stereotype.Component;
 

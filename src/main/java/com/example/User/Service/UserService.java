@@ -20,9 +20,15 @@ public class UserService {
     }
 
     public String addUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
-        return "User created successfully!";
+        User newUser = new User.UserBuilder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .password(passwordEncoder.encode(user.getPassword()))
+                .isActive(true)
+                .build();
+
+        userRepository.save(newUser);
+        return "User created successfully";
     }
 
     public ResponseEntity<User> getUser(Long id) {
@@ -37,7 +43,7 @@ public class UserService {
     public ResponseEntity<String> deleteUser(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
-            return ResponseEntity.ok("User deleted successfully!");
+            return ResponseEntity.ok("User deleted successfully");
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -50,7 +56,7 @@ public class UserService {
             if(user.getEmail() != null) existingUser.setEmail(user.getEmail());
             if(user.getPassword() != null) existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(existingUser);
-            return ResponseEntity.ok("User updated successfully!");
+            return ResponseEntity.ok("User updated successfully");
         }
         return ResponseEntity.notFound().build();
     }
@@ -87,7 +93,7 @@ public class UserService {
 
     public ResponseEntity<String> login(String email, String password) {
         User user = userRepository.findByEmail(email);
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) { // Verify password
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             return ResponseEntity.ok("Login successful");
         }  else {
             return ResponseEntity.status(401).body("Invalid email or password");
