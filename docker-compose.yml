@@ -234,11 +234,14 @@ services:
       - "8084:8080"
     networks:
       - eureka-network
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
-      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+#    environment:
+#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+#      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
     depends_on:
       - eureka-server
+      - user-ms
+      - video-ms
+      - newsfeed-ms
     restart: always
 
 
