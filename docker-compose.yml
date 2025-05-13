@@ -204,6 +204,21 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 #######################################################################################################################################
+  eureka-server:
+    build:
+      context: ./Service-Registry
+      dockerfile: Dockerfile
+    container_name: eureka-server-container
+    ports:
+      - "8761:8761"
+    networks:
+      - eureka-network
+    environment:
+      - EUREKA_INSTANCE_HOSTNAME=eureka-server
+      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
+      - EUREKA_CLIENT_FETCH_REGISTRY=false
+    restart: always
+#######################################################################################################################################
 volumes:
   minio_data:
   mongodb_data:
@@ -222,6 +237,8 @@ networks:
   redis-net:
     driver: bridge
   user-service-network:
+    driver: bridge
+  eureka-network:
     driver: bridge
 
 
