@@ -141,6 +141,7 @@ services:
       - mongodb-network
       - message-queue-network
       - cassandra-net
+      - eureka-network
     volumes:
       - /Users/ahmedhamed/dev/scalable/FinalProject-31-A-PLUS-ISA/testMedia:/opt/videos
 #######################################################################################################################################
@@ -173,6 +174,7 @@ services:
       - message-queue-network
       - cassandra-net
       - redis-net
+      - eureka-network
 #######################################################################################################################################
   user-ms:
     build:
@@ -181,6 +183,7 @@ services:
     container_name: user-ms-container
     networks:
       - user-service-network
+      -  eureka-network
     depends_on:
       - postgres
     environment:
@@ -208,7 +211,7 @@ services:
     build:
       context: ./Service-Registry
       dockerfile: Dockerfile
-    container_name: eureka-server-container
+    container_name: eureka-server
     ports:
       - "8761:8761"
     networks:
