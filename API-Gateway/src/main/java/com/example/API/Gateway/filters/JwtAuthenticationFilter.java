@@ -26,9 +26,17 @@ public class JwtAuthenticationFilter implements WebFilter {
 
     @Value("${jwt.secret}")
     private String SECRET_KEY;
+    private static final String LOGIN_PATH = "/login";
+    private static final String SIGNUP_PATH = "/signup";
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        // Skip authentication for login and signup paths
+        String path = exchange.getRequest().getURI().getPath();
+        if (path.equals(LOGIN_PATH) || path.equals(SIGNUP_PATH)) {
+            return chain.filter(exchange); // Skip the filter for these paths
+        }
+
         String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
         if (token == null || !token.startsWith("Bearer ")) {
