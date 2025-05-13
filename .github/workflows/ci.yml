@@ -1,0 +1,41 @@
+# this workflow is r4epsonsible for building and contarezing the project and then running tests to ensure evrything is working correctly
+
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ "main", "dev"]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  # build job
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+        
+      - name: build the images for the docker compose file
+        run: docker-compose up -d
+
+      - name: restart all the services once their keyspaces(databases) are created
+        run: |
+          cd .github/workflows
+          chmod +x ./wait_for_keyspace.sh
+          ./wait_for_keyspace.sh
+
+      - name: Shut down services
+        run: docker-compose down
+
+
+ 
