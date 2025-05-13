@@ -177,6 +177,7 @@ services:
       - eureka-network
 #######################################################################################################################################
   user-ms:
+    image: user-ms:latest
     build:
       context: ./UserService
       dockerfile: Dockerfile
@@ -208,6 +209,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 #######################################################################################################################################
   eureka-server:
+    image: eureka-server:latest
     build:
       context: ./Service-Registry
       dockerfile: Dockerfile
@@ -221,6 +223,25 @@ services:
       - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
       - EUREKA_CLIENT_FETCH_REGISTRY=false
     restart: always
+#######################################################################################################################################
+  api-gateway:
+    image: api-gateway:latest
+    build:
+      context: ./API-Gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8084:8080"
+    networks:
+      - eureka-network
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    depends_on:
+      - eureka-server
+    restart: always
+
+
 #######################################################################################################################################
 volumes:
   minio_data:
