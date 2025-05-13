@@ -2,7 +2,6 @@ package com.example.API.Gateway.filters;
 
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,8 +10,6 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
-
-import java.security.Key;
 
 
 /*
@@ -38,22 +35,22 @@ public class JwtAuthenticationFilter implements WebFilter {
         // Skip authentication for login and signup paths
         String path = exchange.getRequest().getURI().getPath();
         if (path.equals(LOGIN_PATH) || path.equals(SIGNUP_PATH) || path.equals(SIGNUP_PATH2)) {
-            System.out.println("111111111111111");
             return chain.filter(exchange); // Skip the filter for these paths
         }
 
         String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
         if (token == null || !token.startsWith("Bearer ")) {
-            System.out.println("22222222222222222 "+ token);
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
 
         try {
-            System.out.println("zzzzzzzzzzzzzzzzzzzzzzz "+ token);
-            Claims claims = extractClaims(token);
-            System.out.println("33333333333333333");
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(SECRET_KEY.getBytes()) // convert to bytes
+                    .build()
+                    .parseClaimsJws(token.replace("Bearer ", ""))
+                    .getBody();
 
             String userId = claims.getSubject();
 
@@ -75,28 +72,7 @@ public class JwtAuthenticationFilter implements WebFilter {
             exchange.getResponse().getHeaders().add("Error-Message", "Authentication failed");
             return exchange.getResponse().setComplete();
         }
-        System.out.println("fininsinssinsnisnnsisnisnsiisni");
+
         return chain.filter(exchange);
     }
-
-    public Claims extractClaims(String token) {
-        try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey()) // Ensure this returns the key properly
-                    .build()
-                    .parseClaimsJws(token.replace("Bearer ", ""))
-                    .getBody();
-        } catch (ExpiredJwtException e) {
-            System.out.println("Token expired");
-            throw e;
-        } catch (JwtException e) {
-            System.out.println("Token is invalid");
-            throw e;
-        }
-    }
-
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
-    }
-
 }
