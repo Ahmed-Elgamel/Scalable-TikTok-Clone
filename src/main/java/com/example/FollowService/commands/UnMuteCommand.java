@@ -23,7 +23,7 @@ public class UnMuteCommand implements command{
 
     @Override
     public void execute() {
-        followService.handleUnMuteCommand(followeeId,followerId);
+        followService.handleUnMuteCommand(followerId,followeeId);
 
     }
 }

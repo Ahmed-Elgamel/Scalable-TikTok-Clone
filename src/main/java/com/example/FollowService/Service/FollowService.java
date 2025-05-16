@@ -87,6 +87,10 @@ public class FollowService {
         }
         return byMutalFollowersStrategy.filter(followers);
     }
+    public String deleteAll(){
+        followRepository.deleteAll();
+        return "Deleted All successfully";
+    }
 }
 //
 //        List<String> user1FollowerIds = user1Followers.stream()

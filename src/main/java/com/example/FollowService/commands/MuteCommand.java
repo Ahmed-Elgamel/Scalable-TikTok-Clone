@@ -22,7 +22,7 @@ public class MuteCommand implements command {
 
     @Override
     public void execute() {
-        followService.handleMuteCommand(followeeId,followerId);
+        followService.handleMuteCommand(followerId,followeeId);
       
     }
 }

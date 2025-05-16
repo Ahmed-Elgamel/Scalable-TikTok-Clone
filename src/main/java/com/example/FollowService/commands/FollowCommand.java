@@ -26,6 +26,6 @@ public class FollowCommand implements command{
 
     @Override
     public void execute() {
-        followService.handleFollowCommand(this.followeeId,this.followerId);
+        followService.handleFollowCommand(this.followerId,this.followeeId);
     }
 }

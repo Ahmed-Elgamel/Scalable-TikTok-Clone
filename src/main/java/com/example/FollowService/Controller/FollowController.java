@@ -83,6 +83,10 @@ public class FollowController {
         List<String> followers = followService.getFollowersFilteredByNumOfMutuals(followee,minMutuals);
         return ResponseEntity.ok(followers);
     }
+    @DeleteMapping
+    public ResponseEntity<String> deleteAll(){
+       return ResponseEntity.ok(followService.deleteAll());
+    }
 
 
 

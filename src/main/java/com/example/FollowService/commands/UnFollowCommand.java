@@ -24,6 +24,6 @@ public class UnFollowCommand implements command{
     @Override
     public void execute() {
 
-        followService.handleUnFollowCommand(this.followeeId,this.followerId);
+        followService.handleUnFollowCommand(this.followerId,this.followeeId);
     }
 }
