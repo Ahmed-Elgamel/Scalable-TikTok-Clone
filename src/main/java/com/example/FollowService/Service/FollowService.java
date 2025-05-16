@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import javax.swing.text.html.Option;
 import java.util.*;
 
 @Service
@@ -27,6 +28,11 @@ public class FollowService {
         return followRepository.findByFolloweeId(followeeId);
     }
     public Follow handleFollowCommand(String followerId,String followeeId){
+        Optional<Follow> existing=followRepository.findByFollowerIdAndFolloweeId(followerId,followeeId);
+        if(existing.isPresent())
+        {
+            throw new IllegalStateException("Already following");
+        }
         Follow new_follow=new Follow(followerId,followeeId,new Date());
         return followRepository.save(new_follow);
     }
@@ -38,21 +44,40 @@ public class FollowService {
         return follow;
     }
 
-    public void handleUnMuteCommand(String followerId, String followeeId) {
+    public Follow handleUnMuteCommand(String followerId, String followeeId) {
         Follow follow = followRepository.findByFollowerIdAndFolloweeId(followerId, followeeId)
                 .orElseThrow(() -> new NoSuchElementException("Follow relationship not found"));
 
         follow.setMuted(false);
         followRepository.save(follow);
+        return follow;
+
+    }
+    public Follow handleUnBlockCommand(String followerId, String followeeId) {
+        Follow follow = followRepository.findByFollowerIdAndFolloweeId(followerId, followeeId)
+                .orElseThrow(() -> new NoSuchElementException("Follow relationship not found"));
+
+        follow.setBlocked(false);
+        followRepository.save(follow);
+        return follow;
 
     }
 
-    public void handleMuteCommand(String followerId, String followeeId) {
+    public Follow handleMuteCommand(String followerId, String followeeId) {
         Follow follow = followRepository.findByFollowerIdAndFolloweeId(followerId, followeeId)
                 .orElseThrow(() -> new NoSuchElementException("Follow relationship not found"));
 
         follow.setMuted(true);
         followRepository.save(follow);
+        return follow;
+    }
+    public Follow handleBlockCommand(String followerId, String followeeId) {
+        Follow follow = followRepository.findByFollowerIdAndFolloweeId(followerId, followeeId)
+                .orElseThrow(() -> new NoSuchElementException("Follow relationship not found"));
+
+        follow.setBlocked(true);
+        followRepository.save(follow);
+        return follow;
     }
 
     public List<String> getMutualFollowers(String user1, String user2) {
@@ -77,6 +102,9 @@ public class FollowService {
     public List<String> getFollowersFilteredByDate(String followee,Date date){
         FilterByDateStrategy byDateStrategy=new FilterByDateStrategy(date);
         List<Follow> followers=getFollowers(followee);
+        if (followers.isEmpty()) {
+            return Collections.emptyList();
+        }
         return byDateStrategy.filter(followers);
     }
     public List<String> getFollowersFilteredByNumOfMutuals(String followee,Integer numOfMutuals){
@@ -105,6 +133,7 @@ public class FollowService {
 //        user1FollowerIds.retainAll(user2FollowerIds);
 //
 //        return user1FollowerIds;
+
 
 
 //        List<String> mutual_users=new ArrayList<>();

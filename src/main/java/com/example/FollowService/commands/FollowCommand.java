@@ -1,5 +1,6 @@
 package com.example.FollowService.commands;
 
+import com.example.FollowService.Model.Follow;
 import com.example.FollowService.Service.FollowService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,7 +26,7 @@ public class FollowCommand implements command{
     }
 
     @Override
-    public void execute() {
-        followService.handleFollowCommand(this.followerId,this.followeeId);
+    public Follow execute() {
+        return followService.handleFollowCommand(this.followerId,this.followeeId);
     }
 }

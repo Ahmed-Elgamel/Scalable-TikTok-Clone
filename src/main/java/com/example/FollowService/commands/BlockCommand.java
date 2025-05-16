@@ -3,12 +3,12 @@ package com.example.FollowService.commands;
 import com.example.FollowService.Model.Follow;
 import com.example.FollowService.Service.FollowService;
 
-public class UnMuteCommand implements command{
+public class BlockCommand implements command{
     private final String followerId;
     private final String followeeId;
     private final FollowService followService;
 
-    public UnMuteCommand(String followerId, String followeeId, FollowService followService) {
+    public BlockCommand(String followerId, String followeeId, FollowService followService) {
         this.followerId = followerId;
         this.followeeId = followeeId;
         this.followService = followService;
@@ -22,9 +22,14 @@ public class UnMuteCommand implements command{
         return followeeId;
     }
 
+    public FollowService getFollowService() {
+        return followService;
+    }
+
     @Override
     public Follow execute() {
-        return followService.handleUnMuteCommand(followerId,followeeId);
+        return followService.handleBlockCommand(followerId,followeeId);
 
     }
+
 }

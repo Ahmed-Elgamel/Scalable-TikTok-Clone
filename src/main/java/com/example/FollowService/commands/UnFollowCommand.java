@@ -1,5 +1,6 @@
 package com.example.FollowService.commands;
 
+import com.example.FollowService.Model.Follow;
 import com.example.FollowService.Service.FollowService;
 
 public class UnFollowCommand implements command{
@@ -22,8 +23,8 @@ public class UnFollowCommand implements command{
     }
 
     @Override
-    public void execute() {
+    public Follow execute() {
 
-        followService.handleUnFollowCommand(this.followerId,this.followeeId);
+        return followService.handleUnFollowCommand(this.followerId,this.followeeId);
     }
 }

@@ -14,6 +14,7 @@ public class Follow {
 
     private Date followedAt;
     private boolean muted;
+    private boolean blocked;
 
     public Follow() {
     }
@@ -23,6 +24,7 @@ public class Follow {
         this.followeeId = followeeId;
         this.followedAt = followedAt;
         muted=false;
+        blocked=false;
     }
 
     public boolean isMuted() {
@@ -31,6 +33,14 @@ public class Follow {
 
     public void setMuted(boolean muted) {
         this.muted = muted;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 
     public String getFollowerId() {

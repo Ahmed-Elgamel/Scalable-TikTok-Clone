@@ -1,5 +1,7 @@
 package com.example.FollowService.commands;
 
+import com.example.FollowService.Model.Follow;
+
 public interface command {
-      void  execute();
+      Follow execute();
 }

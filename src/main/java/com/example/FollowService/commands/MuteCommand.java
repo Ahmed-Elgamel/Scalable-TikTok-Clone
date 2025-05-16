@@ -1,5 +1,6 @@
 package com.example.FollowService.commands;
 
+import com.example.FollowService.Model.Follow;
 import com.example.FollowService.Service.FollowService;
 
 public class MuteCommand implements command {
@@ -21,8 +22,8 @@ public class MuteCommand implements command {
     }
 
     @Override
-    public void execute() {
-        followService.handleMuteCommand(followerId,followeeId);
+    public Follow execute() {
+        return followService.handleMuteCommand(followerId,followeeId);
       
     }
 }
