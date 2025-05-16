@@ -6,6 +6,7 @@ import com.example.News.Feed.Service.filter.FilterByTagCommand;
 import com.example.News.Feed.Service.filter.NewsFeedFilterCommand;
 import com.example.News.Feed.Service.model.FeedItem;
 import com.example.News.Feed.Service.repository.FeedItemRepository;
+import com.example.News.Feed.Service.sort.ISortStrategy;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.protocol.types.Field;
@@ -52,11 +53,15 @@ public class NewsFeedService {
 
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Map<String, ISortStrategy> sortStrategies;
 
-    public NewsFeedService(KafkaTemplate<String, FetchUserVideosEventRequest> kafkaTemplateRequest, FeedItemRepository feedItemRepository, FeedCacheService feedCacheService) {
+
+    public NewsFeedService(KafkaTemplate<String, FetchUserVideosEventRequest> kafkaTemplateRequest, FeedItemRepository feedItemRepository, FeedCacheService feedCacheService, List<ISortStrategy> sortStrategies) {
         this.kafkaTemplateRequest = kafkaTemplateRequest;
         this.feedItemRepository = feedItemRepository;
         this.feedCacheService = feedCacheService;
+        this.sortStrategies = sortStrategies.stream()
+        .collect(Collectors.toMap(ISortStrategy::getStrategyName, strategy -> strategy));
     }
 
     public void addFeedItem(String userId, String videoId) {
@@ -194,9 +199,11 @@ public class NewsFeedService {
        }
 
         // Sort needed because it is a feed
-        finalFeed.sort(Comparator.comparing(VideoDTO::getUploadTime).reversed());
+        // finalFeed.sort(Comparator.comparing(VideoDTO::getUploadTime).reversed());
+        ISortStrategy sortStrategy = sortStrategies.get("uploadTime"); // can change key later
+        List<VideoDTO> sortedFeed = sortStrategy.sort(finalFeed);
         // finally store the new feed of target usr in cache
-        feedCacheService.cacheFeedItems(targetUserId, finalFeed);
+        feedCacheService.cacheFeedItems(targetUserId, sortedFeed);
 
     }
 
