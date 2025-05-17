@@ -2,6 +2,7 @@ package com.example.User.Service;
 
 import com.example.User.Model.User;
 import com.example.User.Repository.UserRepository;
+import com.example.User.clients.NewsFeedServiceClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,11 +14,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final NewsFeedServiceClient newsFeedServiceClient;
 
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, NewsFeedServiceClient newsFeedServiceClient) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.newsFeedServiceClient = newsFeedServiceClient;
     }
 
     public ResponseEntity<String> addUser(User user) {
@@ -48,6 +51,7 @@ public class UserService {
     public ResponseEntity<String> deleteUser(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
+            newsFeedServiceClient.deleteVideoFromNewsFeed(id.toString());
             return ResponseEntity.ok("User deleted successfully");
         } else {
             return ResponseEntity.notFound().build();
@@ -81,6 +85,7 @@ public class UserService {
         if (user != null) {
             user.setActive(false);
             userRepository.save(user);
+            newsFeedServiceClient.deleteVideoFromNewsFeed(id.toString());
             return ResponseEntity.ok("User deactivated successfully");
         }
         return ResponseEntity.notFound().build();
