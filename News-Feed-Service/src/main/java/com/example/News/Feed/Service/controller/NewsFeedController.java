@@ -22,7 +22,12 @@ public class NewsFeedController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<FeedDTO> getNewsFeed(@PathVariable String userId) {
-        FeedDTO feedDTO = newsFeedService.buildNewsFeed(userId);
+        FeedDTO feedDTO = null;
+        try {
+            feedDTO = newsFeedService.buildNewsFeed(userId);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return ResponseEntity.ok(feedDTO);
     }
 

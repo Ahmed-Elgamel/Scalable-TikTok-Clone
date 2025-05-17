@@ -71,14 +71,20 @@ public class NewsFeedService {
     }
 
 
-    public FeedDTO buildNewsFeed(String userId){
+    public FeedDTO buildNewsFeed(String userId) throws IOException {
         // see if there is something in cache if yes return it
+        //*********************************************************************************
         // if not then get all the users this user follows (followees/followings)
         // then get all their uploaded videos
         // store in cache
         // return list of video DTOs
         // get all the uploads of this followings
         // update database + cache
+
+        List<VideoDTO> cachedFeed = feedCacheService.getCachedFeedItems(userId);
+        if(cachedFeed !=null && cachedFeed.size()>0){
+            return new FeedDTO(userId, cachedFeed);
+        }
 
         // if not cached do this
         for (String followee: followeesIds){
