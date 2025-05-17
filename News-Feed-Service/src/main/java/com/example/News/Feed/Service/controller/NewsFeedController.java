@@ -39,6 +39,21 @@ public class NewsFeedController {
         return ResponseEntity.ok(feedDTO);
     }
 
+    @GetMapping("/sort/{userId}")
+    public ResponseEntity<FeedDTO>  sortNewsfeed(@PathVariable String userId,
+                                         @RequestParam(defaultValue = "uploadTime") String strategy) {
+        FeedDTO feedDTO = null;
+        try {
+            feedDTO = newsFeedService.sortNewsFeed(userId, strategy);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return ResponseEntity.ok(feedDTO);
+    }
+
+
+
+
 
 
 
