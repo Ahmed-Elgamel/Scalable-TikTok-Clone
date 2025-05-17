@@ -11,14 +11,12 @@ import com.example.News.Feed.Service.sort.SortByCaptionStrategy;
 import com.example.News.Feed.Service.sort.SortByUploadTime;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,6 +47,8 @@ public class NewsFeedService {
     ); // fetched from follow service !!!!!!
 
     private final KafkaTemplate<String, FetchUserVideosEventRequest> kafkaTemplateRequest;
+    private final KafkaTemplate<String, RequestFolloweesEvent> kafkaFetchUserFolloweesRequest;
+
     private final FeedItemRepository feedItemRepository;
     @Autowired
     private final FeedCacheService feedCacheService;
@@ -56,8 +56,9 @@ public class NewsFeedService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public NewsFeedService(KafkaTemplate<String, FetchUserVideosEventRequest> kafkaTemplateRequest, FeedItemRepository feedItemRepository, FeedCacheService feedCacheService) {
+    public NewsFeedService(KafkaTemplate<String, FetchUserVideosEventRequest> kafkaTemplateRequest, KafkaTemplate<String, RequestFolloweesEvent> kafkaFetchUserFolloweesRequest, FeedItemRepository feedItemRepository, FeedCacheService feedCacheService) {
         this.kafkaTemplateRequest = kafkaTemplateRequest;
+        this.kafkaFetchUserFolloweesRequest = kafkaFetchUserFolloweesRequest;
         this.feedItemRepository = feedItemRepository;
         this.feedCacheService = feedCacheService;
     }
@@ -87,10 +88,11 @@ public class NewsFeedService {
         }
 
         // if not cached do this
-        for (String followee: followeesIds){
-            // fire and forget (non-blocking operation because we dont wait for the response)
-            sendFetchUserVideosEvent(userId ,followee,"video.fetch.response");
-        }
+        sendFetchUserFollowees(userId, "followees.fetch.response");
+//        for (String followee: followeesIds){
+//            // fire and forget (non-blocking operation because we dont wait for the response)
+//            sendFetchUserVideosEvent(userId ,followee,"video.fetch.response");
+//        }
 
         return null;
     }
@@ -129,6 +131,37 @@ public class NewsFeedService {
        return feedDTO;
     }
 
+
+    public void sendFetchUserFollowees(String userId, String replyTopic){
+        //send event to get videos of a followee
+        RequestFolloweesEvent event = new RequestFolloweesEvent(
+                UUID.randomUUID(),
+                userId,
+                replyTopic
+        );
+        kafkaFetchUserFolloweesRequest.send("followees.fetch.request", event);
+        System.out.println("****************************sending event to follow service to fetch user followees (NEWSFEED SERVICE)****************************");
+
+    }
+
+    @KafkaListener( topics = "followees.fetch.response",
+            groupId = "newsfeed-followees-consumer-group",
+            containerFactory = "fetchUserFolloweesKafkaListenerFactory"
+    )
+    public void consumeUserFollowees(FolloweesResponseEvent followeesResponseEvent)  {
+        // now we received the followees of the target user
+        // now for all of those followers send event to fetch their videos
+
+        String userId = followeesResponseEvent.getUserId();
+
+        for (String followee: followeesResponseEvent.getFolloweeIds()){
+            // fire and forget (non-blocking operation because we dont wait for the response)
+            sendFetchUserVideosEvent(userId ,followee,"video.fetch.response");
+        }
+
+
+
+    }
 
 
     @KafkaListener(topics = "video-upload-events", groupId = "newsfeed-group") // use a FLINK NODE instead of this function?

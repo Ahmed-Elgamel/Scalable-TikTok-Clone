@@ -245,16 +245,19 @@ services:
     restart: always
 #######################################################################################################################################
   follow-service:
+    image: follow-ms:latest
     build: ./FollowService
     container_name: follow-ms-container
     ports:
       - "8085:8080"
     environment:
       - MONGO_URI=mongodb://root:example@mongo-container:27017/follow_service_db?authSource=admin
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       - mongodb
     networks:
       - mongodb-network
+      - message-queue-network
 #######################################################################################################################################
 volumes:
   minio_data:

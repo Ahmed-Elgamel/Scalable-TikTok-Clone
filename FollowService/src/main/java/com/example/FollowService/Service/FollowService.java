@@ -4,9 +4,11 @@ import com.example.FollowService.Model.Follow;
 import com.example.FollowService.Repository.FollowRepository;
 import com.example.FollowService.commands.FollowCommand;
 import com.example.FollowService.commands.UnFollowCommand;
+import com.example.FollowService.dto.RequestFolloweesEvent;
 import com.example.FollowService.strategy.FilterByDateStrategy;
 import com.example.FollowService.strategy.FilterByMutalFollowersStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 
@@ -126,7 +128,37 @@ public class FollowService {
        followRepository.save(follow);
        return follow;
     }
+
+
+
+
+    @KafkaListener( topics = "followees.fetch.request",
+            groupId = "follow-ms-FolloweesRequest-consumer-group",
+            containerFactory = "RequestUserFolloweesKafkaListenerFactory"
+    )
+    public void consumeFetchUserFollowees(RequestFolloweesEvent requestFolloweesEvent)  {
+        System.out.println("****************************Received event to fetch user followees (FOLLOW SERVICE)****************************");
+
+        // get the followee of this user :)
+        String userId = requestFolloweesEvent.getUserId();
+        String replyTopic = requestFolloweesEvent.getReplyTopic();
+        List<String> followees = new ArrayList<>();
+
+
+
+
+    }
+
+
+
+
+
+
+
+
 }
+
+
 //
 //        List<String> user1FollowerIds = user1Followers.stream()
 //                .map(Follow::getFollowerId)
@@ -151,4 +183,9 @@ public class FollowService {
 //            }
 //        }
 //        return mutual_users;
+
+
+
+
+
 
