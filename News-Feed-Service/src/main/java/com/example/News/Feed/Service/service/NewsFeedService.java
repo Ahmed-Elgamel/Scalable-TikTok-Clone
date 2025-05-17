@@ -8,6 +8,7 @@ import com.example.News.Feed.Service.model.FeedItem;
 import com.example.News.Feed.Service.repository.FeedItemRepository;
 import com.example.News.Feed.Service.sort.NewsfeedSortStrategy;
 import com.example.News.Feed.Service.sort.SortByCaptionStrategy;
+import com.example.News.Feed.Service.sort.SortByUploadTime;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.protocol.types.Field;
@@ -110,8 +111,11 @@ public class NewsFeedService {
        FeedDTO feedDTO = null;
         NewsfeedSortStrategy newsfeedSortStrategy;
 
-
-        if(strategy.equals("caption")){
+        if(strategy.equals("uploadTime")){
+            newsfeedSortStrategy = new SortByUploadTime(userId, feedCacheService);
+            feedDTO = newsfeedSortStrategy.sort();
+        }
+        else if(strategy.equals("caption")){
             newsfeedSortStrategy = new SortByCaptionStrategy(userId, feedCacheService);
             feedDTO = newsfeedSortStrategy.sort();
        }
