@@ -2,6 +2,7 @@ package com.example.VideoService.controller;
 
 import com.example.VideoService.dto.VideoDTO;
 
+import com.example.VideoService.model.UserSavedVideo;
 import com.example.VideoService.seeder.DatabaseSeeder;
 import com.example.VideoService.service.VideoService;
 import io.minio.errors.MinioException;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -83,6 +85,16 @@ public class VideoController {
             return ResponseEntity.ok("Video with ID: " + videoId + " was successfully saved for user: " + userId);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Failed to save video for user: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/save/{userId}")
+    public ResponseEntity<?> getUserSavedVideos(@PathVariable String userId) {
+        try {
+            List<UserSavedVideo> userSavedVideos = videoService.getUserSavedVideos(UUID.fromString(userId));
+            return ResponseEntity.ok(userSavedVideos);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to get saved videos for user: " + e.getMessage());
         }
     }
 

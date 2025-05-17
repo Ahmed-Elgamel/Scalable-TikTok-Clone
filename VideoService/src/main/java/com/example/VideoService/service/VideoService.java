@@ -310,6 +310,10 @@ public class VideoService {
         userSavedVideosRepository.save(savedVideo);
     }
 
+    public List<UserSavedVideo> getUserSavedVideos(UUID userId) {
+        return userSavedVideosRepository.findByKeyUserId(userId);
+    }
+
 
     public void rateVideo(UUID userId, String videoId, int rating) {
         if (rating < 1 || rating > 5) {
