@@ -243,8 +243,18 @@ services:
       - video-ms
       - newsfeed-ms
     restart: always
-
-
+#######################################################################################################################################
+  follow-service:
+    build: ./FollowService
+    container_name: follow-ms-container
+    ports:
+      - "8085:8080"
+    environment:
+      - MONGO_URI=mongodb://root:example@mongo-container:27017/follow_service_db?authSource=admin
+    depends_on:
+      - mongodb
+    networks:
+      - mongodb-network
 #######################################################################################################################################
 volumes:
   minio_data:
