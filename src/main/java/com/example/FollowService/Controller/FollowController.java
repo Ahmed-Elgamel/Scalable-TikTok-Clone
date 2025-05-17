@@ -10,8 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/follow")
@@ -57,13 +56,23 @@ public class FollowController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newFollow);
     }
     @DeleteMapping("/{follower}/{followee}")
-    public ResponseEntity<Follow> unFollow(@PathVariable String follower, @PathVariable String followee) {
-        UnFollowCommand command = new UnFollowCommand(follower, followee,followService);
-        boolean deleted = command.execute() != null;
-        if (!deleted) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> unFollow(@PathVariable String follower, @PathVariable String followee) {
+        try {
+            UnFollowCommand command = new UnFollowCommand(follower, followee, followService);
+            Follow deletedFollow = command.execute();
+            if (deletedFollow == null) {
+                return ResponseEntity.notFound().build();
+
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(deletedFollow);
+        }catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("error", "Follow relationship not found"));
         }
-        return ResponseEntity.noContent().build();
+//        boolean deleted = command.execute() != null;
+//        if (!deleted) {
+//            return ResponseEntity.notFound().build();
+//        }
 
     }
     //mafrood by id mesh follower we followee??
@@ -131,6 +140,17 @@ public class FollowController {
         }
         return ResponseEntity.ok(result);
     }
+    @PatchMapping("/{follower}/{followee}")
+    public ResponseEntity<Follow> editDate(@PathVariable String follower, @PathVariable String followee,@RequestBody Map<String, Date> body ) {
+      Date newDate=body.get("newDate");
+       Follow updatedFollow=followService.updateDate(follower,followee,newDate);
+        if (updatedFollow == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(updatedFollow);
+    }
+
+
 
 
 

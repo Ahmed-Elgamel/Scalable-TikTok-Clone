@@ -119,6 +119,13 @@ public class FollowService {
         followRepository.deleteAll();
         return "Deleted All successfully";
     }
+    public Follow updateDate(String follower,String followee,Date date){
+       Follow follow= followRepository.findByFollowerIdAndFolloweeId(follower,followee)
+                .orElseThrow(() -> new NoSuchElementException("Follow relationship not found"));
+       follow.setFollowedAt(date);
+       followRepository.save(follow);
+       return follow;
+    }
 }
 //
 //        List<String> user1FollowerIds = user1Followers.stream()
