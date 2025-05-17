@@ -1,4 +1,4 @@
-package com.example.User.clients;
+package com.example.VideoService.clients;
 
 
 import org.springframework.cloud.openfeign.FeignClient;
@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 public interface NewsFeedServiceClient {
-    @DeleteMapping("/videos/user/{userId}")
-    String deleteAllUserVideosFromNewsFeed(@PathVariable("userId") String userId);
+    @DeleteMapping("/video/{videoId}")
+    String deleteVideoFromNewsFeed(@PathVariable("videoId") String videoId);
 }

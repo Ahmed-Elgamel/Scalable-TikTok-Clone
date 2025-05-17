@@ -1,5 +1,6 @@
 package com.example.VideoService.service;
 
+import com.example.VideoService.clients.NewsFeedServiceClient;
 import com.example.VideoService.dto.FetchUserVideosEventRequest;
 import com.example.VideoService.dto.FetchUserVideosEventResponse;
 import com.example.VideoService.dto.VideoDTO;
@@ -51,6 +52,7 @@ public class VideoService {
     private final UserVideoRatingRepository userVideoRatingRepository;
     private final KafkaTemplate<String, String> kafkaVideoUploadTemplate;
     private final KafkaTemplate<String, FetchUserVideosEventResponse> kafkaUserVideosResponseTemplate;
+    private final NewsFeedServiceClient newsFeedServiceClient;
     private static final String onVideoUploadTOPIC = "video-upload-events"; // Kafka topic to which we will send the event
 
 
@@ -58,13 +60,14 @@ public class VideoService {
     @Value("${minio.bucket}")
     private String bucketName;
 
-    public VideoService(S3Client s3Client, MinioClient minioClient, VideoMetaDataRepository videoMetaDataRepository, UserVideoRepository userVideoRepository, UserSavedVideosRepository userSavedVideosRepository, UserVideoRatingRepository userVideoRatingRepository, KafkaTemplate<String, String> kafkaVideoUploadTemplate, KafkaTemplate<String, FetchUserVideosEventResponse> kafkaUserVideosResponseTemplate) {
+    public VideoService(S3Client s3Client, MinioClient minioClient, VideoMetaDataRepository videoMetaDataRepository, UserVideoRepository userVideoRepository, UserSavedVideosRepository userSavedVideosRepository, UserVideoRatingRepository userVideoRatingRepository, KafkaTemplate<String, String> kafkaVideoUploadTemplate, KafkaTemplate<String, FetchUserVideosEventResponse> kafkaUserVideosResponseTemplate, NewsFeedServiceClient newsFeedServiceClient) {
         this.videoMetaDataRepository = videoMetaDataRepository;
         this.userVideoRepository = userVideoRepository;
         this.userSavedVideosRepository = userSavedVideosRepository;
         this.userVideoRatingRepository = userVideoRatingRepository;
         this.kafkaVideoUploadTemplate = kafkaVideoUploadTemplate;
         this.kafkaUserVideosResponseTemplate = kafkaUserVideosResponseTemplate;
+        this.newsFeedServiceClient = newsFeedServiceClient;
         this.s3Client = null;
         this.minioClient = minioClient;
     }
@@ -243,6 +246,10 @@ public class VideoService {
             userVideoRepository.deleteByKeyUserIdAndKeyUploadTime(key.getUserId(), key.getUploadTime());
 
             // todo: publish video deleted event in order for newsfeed service to update
+            newsFeedServiceClient.deleteVideoFromNewsFeed(videoId);
+            // todo: delete video from user saved and rated videos?
+
+
 
             return "Video with ID: " + videoId + " successfully deleted for userId: " + userId;
         } catch (Exception e) {
