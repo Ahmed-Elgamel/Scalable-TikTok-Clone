@@ -14,7 +14,7 @@ import java.util.List;
 public class NewsFeedController {
     private final NewsFeedService newsFeedService;
 
-    public NewsFeedController(NewsFeedService newsFeedService){
+    public NewsFeedController(NewsFeedService newsFeedService) {
 
         this.newsFeedService = newsFeedService;
     }
@@ -45,8 +45,8 @@ public class NewsFeedController {
     }
 
     @GetMapping("/sort/{userId}")
-    public ResponseEntity<FeedDTO>  sortNewsfeed(@PathVariable String userId,
-                                         @RequestParam(defaultValue = "uploadTime") String strategy) {
+    public ResponseEntity<FeedDTO> sortNewsfeed(@PathVariable String userId,
+                                                @RequestParam(defaultValue = "uploadTime") String strategy) {
         FeedDTO feedDTO = null;
         try {
             feedDTO = newsFeedService.sortNewsFeed(userId, strategy);
@@ -59,16 +59,21 @@ public class NewsFeedController {
     @DeleteMapping("/video/{videoId}")
     public String deleteVideoFromCache(@PathVariable String videoId) {
         boolean deleted = newsFeedService.deleteVideo(videoId);
-        if(deleted)
+        if (deleted)
             return "Request to delete video " + videoId + " from cache is processed successfully.";
         else
             return "Request to delete video " + videoId + " from cache is processed not successfully.";
     }
 
 
-
-
-
-
+    @DeleteMapping("/videos/user/{userId}")
+    public String deleteAllVideosOfUserFromCache(@PathVariable String userId) {
+        try {
+            newsFeedService.deleteAllVideosOfUser(userId);
+            return "All videos of user " + userId + " have been successfully deleted from the cache.";
+        } catch (Exception e) {
+            return "Failed to delete videos of user " + userId + " from the cache: " + e.getMessage();
+        }
+    }
 
 }
