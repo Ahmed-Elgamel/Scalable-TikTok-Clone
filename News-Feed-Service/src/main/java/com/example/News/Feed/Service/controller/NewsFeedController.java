@@ -2,12 +2,15 @@ package com.example.News.Feed.Service.controller;
 
 import com.example.News.Feed.Service.dto.FeedDTO;
 import com.example.News.Feed.Service.dto.FilterRequestDTO;
+import com.example.News.Feed.Service.model.FeedItem;
 import com.example.News.Feed.Service.service.NewsFeedService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/newsFeed")
@@ -18,6 +21,30 @@ public class NewsFeedController {
 
         this.newsFeedService = newsFeedService;
     }
+
+
+//******************************************** CRUD *******************************************************
+    // CREATE-UPDATE
+    @PostMapping
+    public FeedItem saveFeedItem(@RequestBody FeedItem feedItem){
+        return newsFeedService.saveFeedItem(feedItem);
+    }
+    // READ
+    @GetMapping("/{userId}/{uploadTime}")
+    public Optional<FeedItem> getFeedItem(@PathVariable String userId, @PathVariable String uploadTime) {
+        Instant uploadInstant = Instant.parse(uploadTime);
+        return newsFeedService.getFeedItem(userId, uploadInstant);
+    }
+    //DELETE
+    @DeleteMapping("/{userId}/{uploadTime}")
+    public String deleteFeedItem(@PathVariable String userId, @PathVariable String uploadTime) {
+        Instant uploadInstant = Instant.parse(uploadTime);
+        newsFeedService.deleteFeedItem(userId, uploadInstant);
+        return "FeedItem deleted successfully.";
+    }
+//******************************************** CRUD *******************************************************
+
+
 
 
     @GetMapping("/{userId}")

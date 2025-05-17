@@ -17,6 +17,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,12 +64,19 @@ public class NewsFeedService {
         this.feedCacheService = feedCacheService;
     }
 
-    public void addFeedItem(String userId, String videoId) {
-
+    // create-update
+    public FeedItem saveFeedItem(FeedItem feedItem) {
+        return feedItemRepository.save(feedItem);
     }
-
-    public void deleteFeedItem(String userId, String videoId) {
-
+    // read
+    public Optional<FeedItem> getFeedItem(String userId, Instant uploadTime) {
+        FeedItem.FeedItemKey key = new FeedItem.FeedItemKey(userId, uploadTime);
+        return feedItemRepository.findById(key);
+    }
+    // delete
+    public void deleteFeedItem(String userId, Instant uploadTime) {
+        FeedItem.FeedItemKey key = new FeedItem.FeedItemKey(userId, uploadTime);
+        feedItemRepository.deleteById(key);
     }
 
 
