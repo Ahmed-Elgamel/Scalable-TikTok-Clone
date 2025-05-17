@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class FeedCacheService {
@@ -44,6 +46,36 @@ public class FeedCacheService {
 
     public void deleteFeedCache(String userId) {
         redisTemplate.delete(userId);
+    }
+
+
+    public void deleteVideoFromCache(String videoId) throws IOException, JsonProcessingException {
+        // Get all user keys (assuming they are stored as user IDs)
+        Set<String> allUserKeys = redisTemplate.keys("*");
+
+        if (allUserKeys == null || allUserKeys.isEmpty()) {
+            return;
+        }
+
+        for (String userId : allUserKeys) {
+            String json = (String) redisTemplate.opsForValue().get(userId);
+
+            if (json == null) {
+                continue;
+            }
+
+            List<VideoDTO> cachedFeed = objectMapper.readValue(json, objectMapper.getTypeFactory()
+                    .constructCollectionType(List.class, VideoDTO.class));
+
+            // Filter out the video
+            List<VideoDTO> updatedFeed = cachedFeed.stream()
+                    .filter(video -> !video.getVideoId().equals(videoId))
+                    .collect(Collectors.toList());
+
+            // Write back to Redis
+            String updatedJson = objectMapper.writeValueAsString(updatedFeed);
+            redisTemplate.opsForValue().set(userId, updatedJson);
+        }
     }
 }
 

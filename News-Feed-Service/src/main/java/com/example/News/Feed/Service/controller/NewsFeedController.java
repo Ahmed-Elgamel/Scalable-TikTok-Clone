@@ -56,6 +56,15 @@ public class NewsFeedController {
         return ResponseEntity.ok(feedDTO);
     }
 
+    @DeleteMapping("/video/{videoId}")
+    public String deleteVideoFromCache(@PathVariable String videoId) {
+        boolean deleted = newsFeedService.deleteVideo(videoId);
+        if(deleted)
+            return "Request to delete video " + videoId + " from cache is processed successfully.";
+        else
+            return "Request to delete video " + videoId + " from cache is processed not successfully.";
+    }
+
 
 
 
