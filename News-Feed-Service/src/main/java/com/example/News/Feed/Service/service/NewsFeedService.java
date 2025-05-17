@@ -140,6 +140,15 @@ public class NewsFeedService {
         }
     }
 
+    public boolean deleteAllVideosOfUser(String userId){
+        try {
+            feedCacheService.deleteAllVideosOfUser(userId);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
 
     public void sendFetchUserFollowees(String userId, String replyTopic){
         //send event to get videos of a followee

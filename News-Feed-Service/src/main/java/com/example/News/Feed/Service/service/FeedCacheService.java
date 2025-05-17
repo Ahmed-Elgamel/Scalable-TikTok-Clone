@@ -76,6 +76,46 @@ public class FeedCacheService {
             String updatedJson = objectMapper.writeValueAsString(updatedFeed);
             redisTemplate.opsForValue().set(userId, updatedJson);
         }
+
+
+
+    }
+
+
+    public void deleteAllVideosOfUser(String userId) throws IOException {
+        // Get all keys from Redis
+        Set<String> keys = redisTemplate.keys("*");
+
+        if (keys == null || keys.isEmpty()) {
+            System.out.println("No keys found in Redis.");
+            return;
+        }
+
+        for (String key : keys) {
+            String json = (String) redisTemplate.opsForValue().get(key);
+
+            if (json == null) {
+                continue;
+            }
+
+            List<VideoDTO> cachedFeed = objectMapper.readValue(json, objectMapper.getTypeFactory()
+                    .constructCollectionType(List.class, VideoDTO.class));
+
+            // Filter out all videos of the specified user
+            List<VideoDTO> updatedFeed = cachedFeed.stream()
+                    .filter(video -> !video.getUserId().equals(userId))
+                    .collect(Collectors.toList());
+
+            // Write back to Redis
+            if (updatedFeed.isEmpty()) {
+                redisTemplate.delete(key); // Remove the key if list is empty
+            } else {
+                String updatedJson = objectMapper.writeValueAsString(updatedFeed);
+                redisTemplate.opsForValue().set(key, updatedJson);
+            }
+        }
+
+        System.out.println("All videos of user " + userId + " have been removed from the cache.");
     }
 }
 
