@@ -2,25 +2,28 @@ package com.example.FollowService.Service;
 
 import com.example.FollowService.Model.Follow;
 import com.example.FollowService.Repository.FollowRepository;
-import com.example.FollowService.commands.FollowCommand;
-import com.example.FollowService.commands.UnFollowCommand;
+import com.example.FollowService.dto.FolloweesResponseEvent;
 import com.example.FollowService.dto.RequestFolloweesEvent;
 import com.example.FollowService.strategy.FilterByDateStrategy;
 import com.example.FollowService.strategy.FilterByMutalFollowersStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 
-import javax.swing.text.html.Option;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FollowService {
     @Autowired
     FollowRepository followRepository;
-    public FollowService(FollowRepository followRepository) {
+    private final KafkaTemplate<String, FolloweesResponseEvent> kafkaFetchUserFolloweesResponse;
+
+    public FollowService(FollowRepository followRepository, KafkaTemplate<String, FolloweesResponseEvent> kafkaFetchUserFolloweesResponse) {
         this.followRepository = followRepository;
+        this.kafkaFetchUserFolloweesResponse = kafkaFetchUserFolloweesResponse;
     }
 
     public List<Follow> getAll(){
@@ -129,6 +132,14 @@ public class FollowService {
        return follow;
     }
 
+    public List<String> getFollowees(String userId) {
+        List<Follow> follows = followRepository.findByFollowerId(userId);
+
+        return follows.stream()
+                .map(Follow::getFolloweeId)
+                .collect(Collectors.toList());
+    }
+
 
 
 
@@ -142,7 +153,9 @@ public class FollowService {
         // get the followee of this user :)
         String userId = requestFolloweesEvent.getUserId();
         String replyTopic = requestFolloweesEvent.getReplyTopic();
-        List<String> followees = new ArrayList<>();
+        List<String> followeeIds = getFollowees(userId);
+        FolloweesResponseEvent followeesResponseEvent = new FolloweesResponseEvent(userId, followeeIds);
+        kafkaFetchUserFolloweesResponse.send(replyTopic, followeesResponseEvent);
 
 
 

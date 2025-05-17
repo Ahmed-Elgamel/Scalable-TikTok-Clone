@@ -151,6 +151,7 @@ public class NewsFeedService {
     public void consumeUserFollowees(FolloweesResponseEvent followeesResponseEvent)  {
         // now we received the followees of the target user
         // now for all of those followers send event to fetch their videos
+        System.out.println("****************************Received followees of user (NEWSFEED SERVICE)****************************");
 
         String userId = followeesResponseEvent.getUserId();
 
