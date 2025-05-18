@@ -113,6 +113,9 @@ public class FollowService {
         return byDateStrategy.filter(followers);
     }
     public List<String> getFollowersFilteredByNumOfMutuals(String followee,Integer numOfMutuals){
+//        if (numOfMutuals == null || numOfMutuals < 0) {
+//            throw new IllegalArgumentException("Minimum mutuals must be non-negative");
+//        }
         FilterByMutalFollowersStrategy byMutalFollowersStrategy=new FilterByMutalFollowersStrategy(followee,numOfMutuals,this);
         List<Follow> followers=getFollowers(followee);
         if (followers.isEmpty()) {
@@ -159,7 +162,20 @@ public class FollowService {
 
 
 
-
+    }
+    public String seed(){
+        List<Follow> follows = Arrays.asList(
+                new Follow("youssef", "messi", new Date()),
+                new Follow("mohamed", "messi", new Date()),
+                new Follow("ahmed", "messi", new Date()),
+                new Follow("mohie", "messi", new Date()),
+                new Follow("omar", "messi", new Date()),
+                new Follow("mohie", "youssef", new Date()),
+                new Follow("omar", "youssef", new Date()),
+                new Follow("youssef", "omar", new Date())
+        );
+        followRepository.saveAll(follows);
+        return "Database seeded with follows!";
     }
 
 
