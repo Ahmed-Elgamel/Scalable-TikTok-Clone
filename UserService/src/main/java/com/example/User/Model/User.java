@@ -3,15 +3,17 @@ package com.example.User.Model;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "app_user")
 public class User {
 
     @Id
-    @GeneratedValue(generator = "random-id")
-    @GenericGenerator(name = "random-id", strategy = "com.example.User.Config.RandomIdGenerator")
-    @Column(name = "id",updatable = false, nullable = false)
-    private Long id;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
     @Column(name = "username", nullable = false)
     private String username;
@@ -43,7 +45,7 @@ public class User {
                 '}';
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -81,13 +83,13 @@ public class User {
 
     public static class UserBuilder {
 
-        private Long id;
+        private UUID id;
         private String username;
         private String email;
         private String password;
         private boolean isActive;
 
-        public UserBuilder id(Long id) {
+        public UserBuilder id(UUID id) {
             this.id = id;
             return this;
         }

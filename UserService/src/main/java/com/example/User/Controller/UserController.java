@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")
@@ -25,7 +26,7 @@ public class UserController {
         this.jwtUtil = jwtUtil;
     }
 
-    @PostMapping("/addUser")
+    @PostMapping("/signup")
     public ResponseEntity<String> addUser(@RequestBody User user){
         return userService.addUser(user);
     }
@@ -33,35 +34,35 @@ public class UserController {
     @GetMapping("/getUser")
     public ResponseEntity<User> getUser(@RequestHeader("Authorization") String authHeader){
         String token = authHeader.substring(7);
-        Long userId = jwtUtil.extractUserId(token);
+        UUID userId = jwtUtil.extractUserId(token);
         return userService.getUser(userId);
     }
 
     @DeleteMapping("/deleteUser")
     public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String authHeader){
         String token = authHeader.substring(7);
-        Long userId = jwtUtil.extractUserId(token);
+        UUID userId = jwtUtil.extractUserId(token);
         return userService.deleteUser(userId);
     }
 
     @PutMapping("/updateUser")
     public ResponseEntity<String> updateUser(@RequestHeader("Authorization") String authHeader, @RequestBody User user){
         String token = authHeader.substring(7);
-        Long userId = jwtUtil.extractUserId(token);
+        UUID userId = jwtUtil.extractUserId(token);
         return userService.updateUser(userId, user);
     }
 
     @PutMapping("/activateUser")
     public ResponseEntity<String> activateUser(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.substring(7);
-        Long userId = jwtUtil.extractUserId(token);
+        UUID userId = jwtUtil.extractUserId(token);
         return userService.activateUser(userId);
     }
 
     @PutMapping("/deactivateUser")
     public ResponseEntity<String> deactivateUser(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.substring(7);
-        Long userId = jwtUtil.extractUserId(token);
+        UUID userId = jwtUtil.extractUserId(token);
         return userService.deactivateUser(userId);
     }
 
@@ -77,7 +78,7 @@ public class UserController {
         if (result.equalsIgnoreCase("Login successful")) {
             User existingUser = userService.findByEmail(user.getEmail());
             String token = jwtUtil.generateToken(existingUser.getId());
-            return ResponseEntity.ok("Bearer " + token);
+            return ResponseEntity.ok("Bearer " + token + " " + existingUser.getId());
         }
         else {
             return ResponseEntity.status(401).body("Invalid credentials");

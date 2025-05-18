@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -35,7 +36,7 @@ public class UserService {
         return ResponseEntity.ok("User added successfully");
     }
 
-    public ResponseEntity<User> getUser(Long id) {
+    public ResponseEntity<User> getUser(UUID id) {
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
             return ResponseEntity.ok(user);
@@ -48,19 +49,22 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public ResponseEntity<String> deleteUser(Long id) {
+    public ResponseEntity<String> deleteUser(UUID id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
-            newsFeedServiceClient.deleteAllUserVideosFromNewsFeed(id.toString());
+//            newsFeedServiceClient.deleteAllUserVideosFromNewsFeed(id.toString());
             return ResponseEntity.ok("User deleted successfully");
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
-    public ResponseEntity<String> updateUser(Long id, User user) {
+    public ResponseEntity<String> updateUser(UUID id, User user) {
         User existingUser = userRepository.findById(id).orElse(null);
         if (existingUser != null) {
+            if(!existingUser.isActive()){
+                return ResponseEntity.badRequest().body("User is deactivated");
+            }
             if(user.getUsername() != null) existingUser.setUsername(user.getUsername());
             if(user.getEmail() != null) existingUser.setEmail(user.getEmail());
             if(user.getPassword() != null) existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -70,7 +74,7 @@ public class UserService {
         return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<String> activateUser(Long id) {
+    public ResponseEntity<String> activateUser(UUID id) {
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
             user.setActive(true);
@@ -80,12 +84,12 @@ public class UserService {
         return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<String> deactivateUser(Long id) {
+    public ResponseEntity<String> deactivateUser(UUID id) {
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
             user.setActive(false);
             userRepository.save(user);
-            newsFeedServiceClient.deleteAllUserVideosFromNewsFeed(id.toString());
+//            newsFeedServiceClient.deleteAllUserVideosFromNewsFeed(id.toString());
             return ResponseEntity.ok("User deactivated successfully");
         }
         return ResponseEntity.notFound().build();
