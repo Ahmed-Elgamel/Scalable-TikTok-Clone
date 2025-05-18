@@ -30,6 +30,9 @@ public class FollowService {
         return followRepository.findAll();
     }
     public List<Follow> getFollowers(String followeeId){
+        if (followeeId == null || followeeId.isEmpty()) {
+            throw new IllegalArgumentException("Followee ID must not be null or empty");
+        }
         return followRepository.findByFolloweeId(followeeId);
     }
     public Follow handleFollowCommand(String followerId,String followeeId){
@@ -86,6 +89,10 @@ public class FollowService {
     }
 
     public List<String> getMutualFollowers(String user1, String user2) {
+        if (user1.equals(user2)) {
+            throw new IllegalArgumentException("Users must be different to find mutual followers");
+        }
+
         List<Follow> followers1=getFollowers(user1);
         List<Follow> followers2=getFollowers(user2);
         Set<String> followersSet1 = new HashSet<>();
@@ -105,6 +112,9 @@ public class FollowService {
         }
 
     public List<String> getFollowersFilteredByDate(String followee,Date date){
+        if (date == null) {
+            throw new IllegalArgumentException("Date must not be null");
+        }
         FilterByDateStrategy byDateStrategy=new FilterByDateStrategy(date);
         List<Follow> followers=getFollowers(followee);
         if (followers.isEmpty()) {
@@ -113,9 +123,9 @@ public class FollowService {
         return byDateStrategy.filter(followers);
     }
     public List<String> getFollowersFilteredByNumOfMutuals(String followee,Integer numOfMutuals){
-//        if (numOfMutuals == null || numOfMutuals < 0) {
-//            throw new IllegalArgumentException("Minimum mutuals must be non-negative");
-//        }
+        if (numOfMutuals == null || numOfMutuals < 0) {
+            throw new IllegalArgumentException("Minimum mutuals must be non-negative");
+        }
         FilterByMutalFollowersStrategy byMutalFollowersStrategy=new FilterByMutalFollowersStrategy(followee,numOfMutuals,this);
         List<Follow> followers=getFollowers(followee);
         if (followers.isEmpty()) {
@@ -128,6 +138,9 @@ public class FollowService {
         return "Deleted All successfully";
     }
     public Follow updateDate(String follower,String followee,Date date){
+        if (date == null) {
+            throw new IllegalArgumentException("Date must not be null");
+        }
        Follow follow= followRepository.findByFollowerIdAndFolloweeId(follower,followee)
                 .orElseThrow(() -> new NoSuchElementException("Follow relationship not found"));
        follow.setFollowedAt(date);
