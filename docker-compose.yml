@@ -15,8 +15,8 @@ services:
     ports:
       - "9042:9042"
     environment:
-      - MAX_HEAP_SIZE=4G
-      - HEAP_NEWSIZE=800M
+#      - MAX_HEAP_SIZE=4G
+#      - HEAP_NEWSIZE=800M
       - CASSANDRA_DC=datacenter1
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
     volumes:
@@ -134,6 +134,8 @@ services:
         condition: service_started
       cassandra:
         condition: service_healthy
+      mongodb:
+        condition: service_started
 #      cassandra-init:
 #        condition: service_healthy
     networks:
@@ -155,9 +157,9 @@ services:
       - "8082:8080"
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      SPRING_DATA_CASSANDRA_CONTACT_POINTS: cassandra
-      SPRING_DATA_CASSANDRA_PORT: 9042
-      SPRING_DATA_CASSANDRA_KEYSPACE_NAME: testKeySpace
+#      SPRING_DATA_CASSANDRA_CONTACT_POINTS: cassandra
+#      SPRING_DATA_CASSANDRA_PORT: 9042
+#      SPRING_DATA_CASSANDRA_KEYSPACE_NAME: testKeySpace
 #      SPRING_REDIS_HOST: redis-server
 #      SPRING_REDIS_PORT: 6379
     depends_on:
