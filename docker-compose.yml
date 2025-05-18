@@ -29,22 +29,22 @@ services:
       timeout: 5s
       retries: 10
 #######################################################################################################################################
-  cassandra-init:
-    image: cassandra:latest
-    depends_on:
-        cassandra:
-          condition: service_healthy
-    volumes:
-      - ./News-Feed-Service/init.cql:/init_news.cql
-      - ./VideoService/init.cql:/init_video.cql
-    entrypoint: [ "sh", "-c", "sleep 30 && cqlsh cassandra -f /init_news.cql && cqlsh cassandra -f /init_video.cql" ]
-    networks:
-      - cassandra-net
-    healthcheck:
-      test: [ "CMD", "cqlsh", "cassandra", "-e", "DESCRIBE KEYSPACES" ]
-      interval: 10s
-      retries: 10
-      timeout: 5s
+#  cassandra-init:
+#    image: cassandra:latest
+#    depends_on:
+#        cassandra:
+#          condition: service_healthy
+#    volumes:
+#      - ./News-Feed-Service/init.cql:/init_news.cql
+#      - ./VideoService/init.cql:/init_video.cql
+#    entrypoint: [ "sh", "-c", "sleep 30 && cqlsh cassandra -f /init_news.cql && cqlsh cassandra -f /init_video.cql" ]
+#    networks:
+#      - cassandra-net
+#    healthcheck:
+#      test: [ "CMD", "cqlsh", "cassandra", "-e", "DESCRIBE KEYSPACES" ]
+#      interval: 10s
+#      retries: 10
+#      timeout: 5s
 #######################################################################################################################################
   zookeeper:
     image: bitnami/zookeeper:latest
@@ -133,9 +133,9 @@ services:
       kafka:
         condition: service_started
       cassandra:
-        condition: service_started
-      cassandra-init:
         condition: service_healthy
+#      cassandra-init:
+#        condition: service_healthy
     networks:
       - minio-network
       - mongodb-network
@@ -164,9 +164,9 @@ services:
       kafka:
         condition: service_started
       cassandra:
-        condition: service_started
-      cassandra-init:
         condition: service_healthy
+#      cassandra-init:
+#        condition: service_healthy
       redis:
         condition: service_started
 
