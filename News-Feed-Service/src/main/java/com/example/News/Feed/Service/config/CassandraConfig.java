@@ -1,6 +1,8 @@
 package com.example.News.Feed.Service.config;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.config.DefaultDriverOption;
+import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -9,6 +11,7 @@ import org.springframework.data.cassandra.config.AbstractReactiveCassandraConfig
 import org.springframework.data.cassandra.config.CqlSessionFactoryBean;
 
 import java.net.InetSocketAddress;
+import java.time.Duration;
 
 @Configuration
 public class CassandraConfig extends AbstractCassandraConfiguration {
@@ -44,6 +47,11 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
         try (CqlSession tempSession = CqlSession.builder()
                 .withLocalDatacenter("datacenter1")
                 .addContactPoint(new InetSocketAddress("cassandra", 9042))
+                .withConfigLoader(
+                        DriverConfigLoader.programmaticBuilder()
+                                .withDuration(DefaultDriverOption.REQUEST_TIMEOUT, Duration.ofSeconds(10))
+                                .build()
+                )
                 .build()) {
 
             // ✅ Step 1: Create Keyspace
