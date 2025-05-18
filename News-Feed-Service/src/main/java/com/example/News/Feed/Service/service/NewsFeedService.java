@@ -1,5 +1,6 @@
 package com.example.News.Feed.Service.service;
 
+import com.example.News.Feed.Service.clients.FollowServiceClient;
 import com.example.News.Feed.Service.dto.*;
 import com.example.News.Feed.Service.filter.FilterByDurationCommand;
 import com.example.News.Feed.Service.filter.FilterByTagCommand;
@@ -53,15 +54,17 @@ public class NewsFeedService {
     private final FeedItemRepository feedItemRepository;
     @Autowired
     private final FeedCacheService feedCacheService;
+    private final FollowServiceClient followServiceClient;
 
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public NewsFeedService(KafkaTemplate<String, FetchUserVideosEventRequest> kafkaTemplateRequest, KafkaTemplate<String, RequestFolloweesEvent> kafkaFetchUserFolloweesRequest, FeedItemRepository feedItemRepository, FeedCacheService feedCacheService) {
+    public NewsFeedService(KafkaTemplate<String, FetchUserVideosEventRequest> kafkaTemplateRequest, KafkaTemplate<String, RequestFolloweesEvent> kafkaFetchUserFolloweesRequest, FeedItemRepository feedItemRepository, FeedCacheService feedCacheService, FollowServiceClient followServiceClient) {
         this.kafkaTemplateRequest = kafkaTemplateRequest;
         this.kafkaFetchUserFolloweesRequest = kafkaFetchUserFolloweesRequest;
         this.feedItemRepository = feedItemRepository;
         this.feedCacheService = feedCacheService;
+        this.followServiceClient = followServiceClient;
     }
 
     // create-update
@@ -196,7 +199,8 @@ public class NewsFeedService {
         VideoUploadEvent event = objectMapper.readValue(message, VideoUploadEvent.class);
         System.out.println("Received video uploaded event: " + event.getVideoId() + " by " + event.getUserId());
 
-        // get all the followers of this uploader
+        // get all the followers of this uploader via feign client //todo: make it async in future
+        List<String> followers = followServiceClient.getFollowers(event.getUserId());
         // update news feed caches of all followers of this uploader
         // also update database?
 
