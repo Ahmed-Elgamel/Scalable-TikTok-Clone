@@ -236,6 +236,21 @@ public class FollowController {
                     .body(Collections.singletonMap("error", e.getMessage()).toString());
         }
     }
+    @GetMapping("/followersIds/{followee}")
+    public ResponseEntity<?> getFollowersIds(@PathVariable String followee){
+        try {
+
+
+            List<String> followers = followService.getFollowersIds(followee);
+            if (followers.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(followers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", e.getMessage()));
+        }
+    }
 
 
 
