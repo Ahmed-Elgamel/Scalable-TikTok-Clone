@@ -241,16 +241,16 @@ public class NewsFeedService {
     }
 
 
-    @KafkaListener(topics = "video-upload-events", groupId = "newsfeed-group") // use a FLINK NODE instead of this function?
-    public void handleVideoUploaded(String message) throws JsonProcessingException {
-        VideoUploadEvent event = objectMapper.readValue(message, VideoUploadEvent.class);
-        System.out.println("Received video uploaded event: " + event.getVideoId() + " by " + event.getUserId());
+    @KafkaListener(
+            topics = "video-upload-events",
+            groupId = "newsfeed-video-upload-events-consumer-group",
+            containerFactory = "videoUploadedKafkaListenerFactory") // use a FLINK NODE instead of this function?
+    public void handleVideoUploaded(VideoDTO uploadedVideoDTO) throws JsonProcessingException {
+        System.out.println("Received video uploaded event: " + uploadedVideoDTO.getVideoId() + " by " + uploadedVideoDTO.getUserId());
 
         // get all the followers of this uploader via feign client //todo: make it async in future
-        List<String> followers = followServiceClient.getFollowers(event.getUserId());
-        for(String followerId: followers){
-            System.out.println("follower with id: "+ followerId);
-        }
+        List<String> followers = followServiceClient.getFollowers(uploadedVideoDTO.getUserId());
+
         // update news feed caches of all followers of this uploader
         // also update database? yes:)
 

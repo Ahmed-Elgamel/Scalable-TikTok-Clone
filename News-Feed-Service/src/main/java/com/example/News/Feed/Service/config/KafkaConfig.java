@@ -1,10 +1,7 @@
 package com.example.News.Feed.Service.config;
 
 
-import com.example.News.Feed.Service.dto.FetchUserVideosEventRequest;
-import com.example.News.Feed.Service.dto.FetchUserVideosEventResponse;
-import com.example.News.Feed.Service.dto.FolloweesResponseEvent;
-import com.example.News.Feed.Service.dto.RequestFolloweesEvent;
+import com.example.News.Feed.Service.dto.*;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -89,6 +86,29 @@ public class KafkaConfig {
 
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
     }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, VideoDTO> videoUploadedKafkaListenerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, VideoDTO> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(videoUploadedConsumerFactory());
+        return factory;
+    }
+
+    @Bean
+    public ConsumerFactory<String, VideoDTO> videoUploadedConsumerFactory() {
+        JsonDeserializer<VideoDTO> deserializer = new JsonDeserializer<>(VideoDTO.class,false);
+        deserializer.addTrustedPackages("com.example.VideoService.dto", "com.example.News.Feed.Service.dto");
+
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "newsfeed-video-upload-events-consumer-group");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
+    }
+
+
 
 
 

@@ -13,6 +13,8 @@ import com.example.VideoService.repository.UserSavedVideosRepository;
 import com.example.VideoService.repository.UserVideoRatingRepository;
 import com.example.VideoService.repository.UserVideoRepository;
 import com.example.VideoService.repository.VideoMetaDataRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.minio.MinioClient;
 import io.minio.errors.MinioException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +58,8 @@ public class VideoService {
     private final KafkaTemplate<String, FetchUserVideosEventResponse> kafkaUserVideosResponseTemplate;
     private final NewsFeedServiceClient newsFeedServiceClient;
     private static final String onVideoUploadTOPIC = "video-upload-events"; // Kafka topic to which we will send the event
-
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
     @Value("${minio.bucket}")
@@ -116,7 +119,7 @@ public class VideoService {
             uploadStrategy.saveUserVideo(videoDTO, file);
 
             //todo: send to user service?
-            publishUploadEvent(videoId, userId); // send event to kafka to be later on be processed by consumers
+            publishUploadEvent(videoDTO, userId); // send event to kafka to be later on be processed by consumers
 
 
 
@@ -151,10 +154,18 @@ public class VideoService {
     }
 
 
-    public void publishUploadEvent(String videoId, String userId){
+    public void publishUploadEvent(VideoDTO uploadedVideoDTO, String userId){
 
-        String videoUploadEvent = "{\"videoId\": \"" + videoId + "\", " +
-                                        "\"userId\": \"" + userId + "\" }";
+
+
+        String videoUploadEvent = null;
+        try {
+            videoUploadEvent = objectMapper.writeValueAsString(uploadedVideoDTO);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+
         System.out.println("****************************PUBLISHED VIDEO UPLOADED (VIDEO SERVICE)****************************");
         kafkaVideoUploadTemplate.send(onVideoUploadTOPIC, videoUploadEvent);
     }
