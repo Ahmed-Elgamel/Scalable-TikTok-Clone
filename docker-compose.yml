@@ -260,6 +260,7 @@ services:
     networks:
       - mongodb-network
       - message-queue-network
+      - eureka-network
 #######################################################################################################################################
   prometheus:
     image: prom/prometheus:v2.44.0
