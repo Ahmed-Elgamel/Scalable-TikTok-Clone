@@ -11,6 +11,6 @@ import java.util.List;
 
 
 public interface FollowServiceClient {
-    @GetMapping("/followers/{followee}")
+    @GetMapping("/followersIds/{followee}")
     List<String> getFollowers(@PathVariable("followee") String followee);
 }

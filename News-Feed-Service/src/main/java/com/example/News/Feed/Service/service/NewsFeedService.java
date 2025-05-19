@@ -248,8 +248,11 @@ public class NewsFeedService {
 
         // get all the followers of this uploader via feign client //todo: make it async in future
         List<String> followers = followServiceClient.getFollowers(event.getUserId());
+        for(String followerId: followers){
+            System.out.println("follower with id: "+ followerId);
+        }
         // update news feed caches of all followers of this uploader
-        // also update database?
+        // also update database? yes:)
 
 
     }
