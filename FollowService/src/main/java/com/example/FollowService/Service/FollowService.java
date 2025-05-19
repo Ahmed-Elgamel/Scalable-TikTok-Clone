@@ -193,7 +193,12 @@ public class FollowService {
 
 
 
-
+    public List<String> getFollowersIds(String followeeId){
+        if (followeeId == null || followeeId.isEmpty()) {
+            throw new IllegalArgumentException("Followee ID must not be null or empty");
+        }
+        return followRepository.findByFolloweeId(followeeId).stream().map(Follow::getFollowerId).collect(Collectors.toList());
+    }
 
 
 
