@@ -108,6 +108,11 @@ public class NewsFeedService {
         return null;
     }
 
+    public FeedDTO refreshNewsFeed(String userId) throws IOException {
+        sendFetchUserFollowees(userId, "followees.fetch.response");
+        return null;
+    }
+
 
     public FeedDTO filterNewsFeed(String userId, FilterRequestDTO filterRequestDTO) throws IOException {
         NewsFeedFilterCommand newsFeedFilterCommand;

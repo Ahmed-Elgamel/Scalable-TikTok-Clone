@@ -45,7 +45,16 @@ public class NewsFeedController {
 //******************************************** CRUD *******************************************************
 
 
-
+    @GetMapping("/refresh/{userId}")
+    public ResponseEntity<FeedDTO> refreshNewsFeed(@PathVariable String userId) {
+        FeedDTO feedDTO = null;
+        try {
+            feedDTO = newsFeedService.refreshNewsFeed(userId);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return ResponseEntity.ok(feedDTO);
+    }
 
     @GetMapping("/{userId}")
     public ResponseEntity<FeedDTO> getNewsFeed(@PathVariable String userId) {
