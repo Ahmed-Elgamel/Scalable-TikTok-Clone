@@ -265,7 +265,7 @@ public class VideoService {
             List<UserVideoRating> userVideoRatings = userVideoRatingRepository.findByKeyUserId(userId);
 
             for(UserSavedVideo userSavedVideo: userSavedVideos){
-                if(userSavedVideo.getKey().getSaveTime() .equals(key.getUploadTime())){
+                if(userSavedVideo.getSavedVideoId() .equals(videoId)){
                     userSavedVideosRepository.deleteById(userSavedVideo.getKey());
                 }
             }
