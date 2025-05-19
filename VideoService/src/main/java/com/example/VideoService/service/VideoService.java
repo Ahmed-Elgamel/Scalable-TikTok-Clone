@@ -261,6 +261,20 @@ public class VideoService {
             // todo: publish video deleted event in order for newsfeed service to update
             newsFeedServiceClient.deleteVideoFromNewsFeed(videoId);
             // todo: delete video from user saved and rated videos?
+            List<UserSavedVideo> userSavedVideos = userSavedVideosRepository.findByKeyUserId(userId);
+            List<UserVideoRating> userVideoRatings = userVideoRatingRepository.findByKeyUserId(userId);
+
+            for(UserSavedVideo userSavedVideo: userSavedVideos){
+                if(userSavedVideo.getKey().getSaveTime() .equals(key.getUploadTime())){
+                    userSavedVideosRepository.deleteById(userSavedVideo.getKey());
+                }
+            }
+            for(UserVideoRating userVideoRating: userVideoRatings){
+                if(userVideoRating.getKey().getVideoId() .equals( videoId)){
+                    userVideoRatingRepository.deleteById(userVideoRating.getKey());
+                }
+            }
+
 
 
 
