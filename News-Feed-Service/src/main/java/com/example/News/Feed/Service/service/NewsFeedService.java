@@ -245,16 +245,57 @@ public class NewsFeedService {
             topics = "video-upload-events",
             groupId = "newsfeed-video-upload-events-consumer-group",
             containerFactory = "videoUploadedKafkaListenerFactory") // use a FLINK NODE instead of this function?
-    public void handleVideoUploaded(VideoDTO uploadedVideoDTO) throws JsonProcessingException {
+    public void handleVideoUploaded(VideoDTO uploadedVideoDTO) throws IOException {
         System.out.println("Received video uploaded event: " + uploadedVideoDTO.getVideoId() + " by " + uploadedVideoDTO.getUserId());
 
         // get all the followers of this uploader via feign client //todo: make it async in future
-        List<String> followers = followServiceClient.getFollowers(uploadedVideoDTO.getUserId());
+        List<String> followersIds = followServiceClient.getFollowers(uploadedVideoDTO.getUserId());
 
-        // update news feed caches of all followers of this uploader
-        // also update database? yes:)
+        // Step 2: Create feed items for each follower
+        List<FeedItem> feedItems = followersIds.stream().map(followerId ->
+                new FeedItem(
+                        new FeedItem.FeedItemKey(followerId, uploadedVideoDTO.getUploadTime()),
+                        uploadedVideoDTO.getVideoId(),
+                        uploadedVideoDTO.getBucketName(),
+                        uploadedVideoDTO.getCaption(),
+                        uploadedVideoDTO.getTags(),
+                        uploadedVideoDTO.getDurationSeconds()
+                )
+        ).collect(Collectors.toList());
 
+        // Step 3: Save feed items to Cassandra
+        feedItemRepository.saveAll(feedItems);
 
+        // Step 4: Update each follower's cache
+        for (String followerId : followersIds) {
+            // Get existing cached feed
+            List<VideoDTO> cachedFeed = feedCacheService.getCachedFeedItems(followerId);
+            List<VideoDTO> updatedFeed = new ArrayList<>();
+
+            if (cachedFeed != null)
+                updatedFeed.addAll(cachedFeed); // add already cached feed
+
+            // Add the new video
+            updatedFeed.add(uploadedVideoDTO);
+
+            // Remove duplicates by videoId
+            HashSet<String> seenVideoIds = new HashSet<>();
+            List<VideoDTO> finalFeed = new ArrayList<>();
+
+            for (VideoDTO video : updatedFeed) {
+                if (seenVideoIds.add(video.getVideoId())) { // adds only if not already present
+                    finalFeed.add(video);
+                }
+            }
+
+            // Sort by upload time (most recent first)
+            finalFeed.sort(Comparator.comparing(VideoDTO::getUploadTime).reversed());
+
+            // Update cache
+            feedCacheService.cacheFeedItems(followerId, finalFeed);
+        }
+
+        System.out.println("****************************Completed updating feeds for all followers****************************");
     }
 
     public void sendFetchUserVideosEvent(String targetUserId,String followee, String replyTopic){
