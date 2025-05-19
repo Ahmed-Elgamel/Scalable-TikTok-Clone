@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: user-ms
+  name: user-ms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: user-ms
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: user-ms
+    spec:
+      containers:
+        - env:
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "1234"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/user
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+          image: ahmedhamed22/user-ms:latest
+          name: user-ms-container
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+      restartPolicy: Always

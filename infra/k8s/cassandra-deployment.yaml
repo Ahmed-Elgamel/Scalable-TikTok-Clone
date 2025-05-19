@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: cassandra
+  name: cassandra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: cassandra
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: cassandra
+    spec:
+      containers:
+        - env:
+            - name: CASSANDRA_DC
+              value: datacenter1
+            - name: CASSANDRA_ENDPOINT_SNITCH
+              value: GossipingPropertyFileSnitch
+          image: cassandra:latest
+          livenessProbe:
+            exec:
+              command:
+                - cqlsh -e 'DESCRIBE KEYSPACES' || exit 1
+            failureThreshold: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: cassandra
+          ports:
+            - containerPort: 9042
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/cassandra
+              name: cassandra-data
+      restartPolicy: Always
+      volumes:
+        - name: cassandra-data
+          persistentVolumeClaim:
+            claimName: cassandra-data
