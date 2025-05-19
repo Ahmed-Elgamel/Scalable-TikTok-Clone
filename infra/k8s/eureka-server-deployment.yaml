@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: eureka-server
+  name: eureka-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: eureka-server
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: eureka-server
+    spec:
+      containers:
+        - env:
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "false"
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "false"
+            - name: EUREKA_INSTANCE_HOSTNAME
+              value: eureka-server
+          image: ahmedhamed22/eureka-server:latest
+          name: eureka-server
+          ports:
+            - containerPort: 8761
+              protocol: TCP
+      restartPolicy: Always
