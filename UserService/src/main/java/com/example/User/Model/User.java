@@ -10,8 +10,6 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
@@ -25,6 +23,13 @@ public class User {
     private String password;
 
     private boolean isActive = true;
+
+    @PrePersist
+    public void ensureId() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID();
+        }
+    }
 
     public User() {
     }
@@ -79,6 +84,10 @@ public class User {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public static class UserBuilder {

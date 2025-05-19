@@ -6,8 +6,10 @@ import com.example.User.Command.LogoutCommand;
 import com.example.User.Model.User;
 import com.example.User.Security.JwtUtil;
 import com.example.User.Service.UserService;
+import com.example.User.seed.DatabaseSeeder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 import java.util.UUID;
@@ -19,11 +21,13 @@ public class UserController {
     private final CommandInvoker commandInvoker;
     private final UserService userService;
     private final JwtUtil jwtUtil;
+    private final DatabaseSeeder databaseSeeder;
 
-    public UserController(UserService userService, CommandInvoker commandInvoker, JwtUtil jwtUtil) {
+    public UserController(UserService userService, CommandInvoker commandInvoker, JwtUtil jwtUtil, DatabaseSeeder databaseSeeder) {
         this.userService = userService;
         this.commandInvoker = commandInvoker;
         this.jwtUtil = jwtUtil;
+        this.databaseSeeder = databaseSeeder;
     }
 
     @PostMapping("/signup")
@@ -78,7 +82,7 @@ public class UserController {
         if (result.equalsIgnoreCase("Login successful")) {
             User existingUser = userService.findByEmail(user.getEmail());
             String token = jwtUtil.generateToken(existingUser.getId());
-            return ResponseEntity.ok("Bearer " + token + " " + existingUser.getId());
+            return ResponseEntity.ok("Bearer " + token + "   ID: " + existingUser.getId());
         }
         else {
             return ResponseEntity.status(401).body("Invalid credentials");
@@ -89,5 +93,17 @@ public class UserController {
     public ResponseEntity<String> logout() {
         commandInvoker.setCommand(new LogoutCommand(userService));
         return ResponseEntity.ok(commandInvoker.executeCommand());
+    }
+
+    @GetMapping("/seed")
+    public String seed() {
+        databaseSeeder.seed();
+        return "Database seeded!!";
+    }
+
+    @GetMapping("/seedWithUUIDs")
+    public String seedWithUUID() {
+        databaseSeeder.seedWithUUIDs();
+        return "Database seeded with UUID!!";
     }
 }
