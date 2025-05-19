@@ -113,7 +113,12 @@ public class NewsFeedService {
         return null;
     }
 
-    public FeedDTO retreiveOldNewsFeedFromDb(String userId) throws IOException {
+    public FeedDTO retreiveNewsFeedFromCache(String userId) throws IOException {
+        return new FeedDTO(userId, feedCacheService.getCachedFeedItems(userId));
+
+    }
+
+        public FeedDTO retreiveOldNewsFeedFromDb(String userId) throws IOException {
         // get old feed from db
         //put it in cache
         // return it also in FeedDTO

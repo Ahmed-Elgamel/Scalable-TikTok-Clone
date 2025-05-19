@@ -44,6 +44,17 @@ public class NewsFeedController {
     }
 //******************************************** CRUD *******************************************************
 
+    @GetMapping("/cache/{userId}")
+    public ResponseEntity<FeedDTO> retreiveNewsFeedFromCache(@PathVariable String userId) {
+        FeedDTO feedDTO = null;
+        try {
+            feedDTO = newsFeedService.retreiveNewsFeedFromCache(userId);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return ResponseEntity.ok(feedDTO);
+    }
+
     @GetMapping("/OldNewsFeed/{userId}")
     public ResponseEntity<FeedDTO> retreiveOldNewsFeedFromDb(@PathVariable String userId) {
         FeedDTO feedDTO = null;
