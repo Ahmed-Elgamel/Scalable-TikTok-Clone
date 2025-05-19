@@ -113,7 +113,21 @@ public class VideoController {
         }
     }
 
+    @PostMapping("/{userId}/{videoId}/tags")
+    public ResponseEntity<VideoDTO> addTags(
+            @PathVariable UUID userId,
+            @PathVariable String videoId,
+            @RequestBody List<String> tags) {
 
+        try {
+            VideoDTO updatedVideoDTO = videoService.addTags(userId, videoId, tags);
+            return ResponseEntity.ok(updatedVideoDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
 
 
 

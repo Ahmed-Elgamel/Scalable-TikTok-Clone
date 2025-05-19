@@ -1,5 +1,6 @@
 package com.example.VideoService.service;
 
+import ch.qos.logback.classic.spi.IThrowableProxy;
 import com.example.VideoService.clients.NewsFeedServiceClient;
 import com.example.VideoService.dto.FetchUserVideosEventRequest;
 import com.example.VideoService.dto.FetchUserVideosEventResponse;
@@ -34,6 +35,7 @@ import java.lang.reflect.Field;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -336,6 +338,54 @@ public class VideoService {
         System.out.println("Successfully rated video with ID: " + videoId + " as " + rating + " by user: " + userId);
     }
 
+
+    public VideoDTO addTags(UUID userId, String videoId, List<String> tags) {
+        // Fetch the video from the database
+        List<UserVideo> videos = userVideoRepository.findByKeyUserId(userId);
+
+        // Step 2: Filter the video by videoId
+        Optional<UserVideo> optionalUserVideo = videos.stream()
+                .filter(video -> video.getVideoId().equals(videoId))
+                .findFirst();
+
+        if (optionalUserVideo == null) {
+            throw new IllegalArgumentException("Video not found for the given userId and videoId");
+        }
+        UserVideo userVideoToBeUpdated = optionalUserVideo.get();
+
+        // Add tags to the existing list
+
+        List<String> existingTags = userVideoToBeUpdated.getTags();
+        if(existingTags == null)
+            existingTags = new ArrayList<>();
+        existingTags.addAll(tags);
+
+        // Remove duplicates if needed
+        userVideoToBeUpdated.setTags(existingTags.stream().distinct().toList());
+
+        // Save back to the database
+        userVideoRepository.save(userVideoToBeUpdated);
+
+        // update meta data database
+        VideoMetaData videoMetaDataToBeUpdated = videoMetaDataRepository.findById(videoId).get();
+        List<String> videoMetaDataTags = videoMetaDataToBeUpdated.getTags();
+        if(videoMetaDataTags==null)tags = new ArrayList<>();
+        videoMetaDataTags.addAll(tags);
+        videoMetaDataToBeUpdated.setTags(videoMetaDataTags.stream().distinct().toList());
+        videoMetaDataRepository.save(videoMetaDataToBeUpdated);
+
+        return new VideoDTO(
+                userVideoToBeUpdated.getVideoId(),
+                userVideoToBeUpdated.getKey().getUserId().toString(),
+                userVideoToBeUpdated.getBucketName(),
+                userVideoToBeUpdated.getCaption(),
+                userVideoToBeUpdated.getKey().getUploadTime(),
+                userVideoToBeUpdated.getTags(),
+                userVideoToBeUpdated.getDurationSeconds()
+
+
+                );
+    }
 
 
 

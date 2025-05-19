@@ -25,6 +25,14 @@ public class VideoMetaData {
 
     private List<String> tags;
 
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
     public String getBucketName() {
         return bucketName;
     }
