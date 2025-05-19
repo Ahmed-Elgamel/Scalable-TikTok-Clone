@@ -113,6 +113,48 @@ public class NewsFeedService {
         return null;
     }
 
+    public FeedDTO retreiveOldNewsFeedFromDb(String userId) throws IOException {
+        // get old feed from db
+        //put it in cache
+        // return it also in FeedDTO
+
+        //get from db
+        List<FeedItem> feedItemsDb = feedItemRepository.findByKeyUserIdOrderByKeyUploadTimeDesc(userId);
+        List<VideoDTO> videoDTOSdb = (feedItemsDb.stream()
+                .map(item -> new VideoDTO(
+                        item.getVideoId(),
+                        item.getUserId(),
+                        item.getBucketName(),
+                        item.getCaption(),
+                        item.getUploadTime(),
+                        item.getTags(),
+                        item.getDurationSeconds()
+                        )))
+                .collect(Collectors.toList());
+
+        List<VideoDTO> videoDTOScache = feedCacheService.getCachedFeedItems(userId);
+
+        Set<String> seenVideoIds = new HashSet<>();
+        List<VideoDTO> mergedVideos = videoDTOSdb.stream()
+                .filter(video -> seenVideoIds.add(video.getVideoId())) // Add to set, filter duplicates
+                .collect(Collectors.toList());
+
+        videoDTOScache.stream()
+                .filter(video -> seenVideoIds.add(video.getVideoId())) // Avoid duplicates
+                .forEach(mergedVideos::add);
+
+
+
+        // update cache with videos retrieved from db
+        feedCacheService.cacheFeedItems(userId, mergedVideos);
+
+
+
+
+
+        return new FeedDTO(userId, mergedVideos);
+    }
+
 
     public FeedDTO filterNewsFeed(String userId, FilterRequestDTO filterRequestDTO) throws IOException {
         NewsFeedFilterCommand newsFeedFilterCommand;

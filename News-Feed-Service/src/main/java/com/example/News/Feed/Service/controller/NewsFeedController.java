@@ -44,6 +44,16 @@ public class NewsFeedController {
     }
 //******************************************** CRUD *******************************************************
 
+    @GetMapping("/OldNewsFeed/{userId}")
+    public ResponseEntity<FeedDTO> retreiveOldNewsFeedFromDb(@PathVariable String userId) {
+        FeedDTO feedDTO = null;
+        try {
+            feedDTO = newsFeedService.retreiveOldNewsFeedFromDb(userId);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return ResponseEntity.ok(feedDTO);
+    }
 
     @GetMapping("/refresh/{userId}")
     public ResponseEntity<FeedDTO> refreshNewsFeed(@PathVariable String userId) {
@@ -56,8 +66,8 @@ public class NewsFeedController {
         return ResponseEntity.ok(feedDTO);
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<FeedDTO> getNewsFeed(@PathVariable String userId) {
+    @GetMapping("/build/{userId}")
+    public ResponseEntity<FeedDTO> buildNewsFeed(@PathVariable String userId) {
         FeedDTO feedDTO = null;
         try {
             feedDTO = newsFeedService.buildNewsFeed(userId);

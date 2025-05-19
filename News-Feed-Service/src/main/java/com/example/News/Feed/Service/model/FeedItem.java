@@ -64,6 +64,7 @@ public class FeedItem {
     public FeedItem() {}
 
 
+
     public FeedItem(FeedItemKey key, String videoId, String bucketName, String caption, List<String> tags, double durationSeconds) {
         this.key = key;
         this.videoId = videoId;
@@ -111,5 +112,20 @@ public class FeedItem {
 
     public String getUserId() {
         return key != null ? key.getUserId() : null;
+    }
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public double getDurationSeconds() {
+        return durationSeconds;
+    }
+
+    public void setDurationSeconds(double durationSeconds) {
+        this.durationSeconds = durationSeconds;
     }
 }
