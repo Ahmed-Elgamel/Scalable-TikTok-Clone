@@ -8,9 +8,11 @@ metadata:
     io.kompose.service: api-gateway
   name: api-gateway
 spec:
+  type: NodePort
   ports:
     - name: "8084"
       port: 8084
       targetPort: 8080
+      nodePort: 30084   # External port exposed on each Node
   selector:
     io.kompose.service: api-gateway
