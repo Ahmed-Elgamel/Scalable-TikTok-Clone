@@ -34,8 +34,8 @@ spec:
               command:
                 - cqlsh -e 'DESCRIBE KEYSPACES' || exit 1
             failureThreshold: 10
-            periodSeconds: 10
-            timeoutSeconds: 5
+            periodSeconds: 100
+            timeoutSeconds: 100
           name: cassandra
           ports:
             - containerPort: 9042

@@ -35,11 +35,11 @@ spec:
           ports:
             - containerPort: 8080
               protocol: TCP
-          volumeMounts:
-            - mountPath: /opt/videos
-              name: video-ms-cm0
+#          volumeMounts:
+#            - mountPath: /opt/videos
+#              name: video-ms-cm0
       restartPolicy: Always
-      volumes:
-        - configMap:
-            name: video-ms-cm0
-          name: video-ms-cm0
+#      volumes:
+#        - configMap:
+#            name: video-ms-cm0
+#          name: video-ms-cm0
