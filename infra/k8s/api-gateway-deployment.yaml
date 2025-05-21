@@ -23,11 +23,11 @@ spec:
       containers:
         - env:
             - name: FOLLOW_SERVICE_URL
-              value: http://follow-service:8080
+              value: http://follow-service:8085
             - name: NEWSFEED_SERVICE_URL
-              value: http://newsfeed-ms:8080
+              value: http://newsfeed-ms:8082
             - name: USER_SERVICE_URL
-              value: http://user-ms:8080
+              value: http://user-ms:8083
             - name: VIDEO_SERVICE_URL
               value: http://video-ms:8080
           image: ahmedhamed22/api-gateway:latest

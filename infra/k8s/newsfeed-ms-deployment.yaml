@@ -26,6 +26,9 @@ spec:
               value: http://follow-service:8080/api/follow
             - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
               value: kafka:9092
+            - name: REDIS_HOST
+              value: redis
+
           image: ahmedhamed22/newsfeed-ms:latest
           name: newsfeed-ms-container
           ports:
