@@ -23,7 +23,7 @@ spec:
       containers:
         - env:
             - name: MONGO_URI
-              value: mongodb://root:example@mongo-container:27017/follow_service_db?authSource=admin
+              value: mongodb://root:example@mongodb:27017/follow_service_db?authSource=admin
             - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
               value: kafka:9092
           image: ahmedhamed22/follow-ms:latest

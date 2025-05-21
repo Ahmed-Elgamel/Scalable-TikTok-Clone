@@ -32,6 +32,8 @@ spec:
               value: minio
             - name: NEWSFEED_SERVICE_URL
               value: http://newsfeed-ms:8080/newsFeed
+            - name: MONGO_URI
+              value: mongodb://root:example@mongodb:27017/video_metadata_db?authSource=admin
           image: ahmedhamed22/video-ms:latest
           name: video-ms-container
           ports:
