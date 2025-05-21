@@ -128,6 +128,7 @@ services:
       MINIO_ROOT_PASSWORD: minio123
       MINIO_ENDPOINT: http://minio:9000
       NEWSFEED_SERVICE_URL: http://newsfeed-ms-container:8080/newsFeed
+      MONGO_URI: mongodb://root:example@mongo-container:27017/video_metadata_db?authSource=admin
     depends_on:
       minio:
         condition: service_started

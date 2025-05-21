@@ -21,7 +21,16 @@ spec:
         io.kompose.service: api-gateway
     spec:
       containers:
-        - image: ahmedhamed22/api-gateway:latest
+        - env:
+            - name: FOLLOW_SERVICE_URL
+              value: http://follow-service:8080
+            - name: NEWSFEED_SERVICE_URL
+              value: http://newsfeed-ms:8080
+            - name: USER_SERVICE_URL
+              value: http://user-ms:8080
+            - name: VIDEO_SERVICE_URL
+              value: http://video-ms:8080
+          image: ahmedhamed22/api-gateway:latest
           name: api-gateway
           ports:
             - containerPort: 8080

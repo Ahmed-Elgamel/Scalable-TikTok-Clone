@@ -30,6 +30,8 @@ spec:
               value: minio123
             - name: MINIO_ROOT_USER
               value: minio
+            - name: NEWSFEED_SERVICE_URL
+              value: http://newsfeed-ms:8080/newsFeed
           image: ahmedhamed22/video-ms:latest
           name: video-ms-container
           ports:
