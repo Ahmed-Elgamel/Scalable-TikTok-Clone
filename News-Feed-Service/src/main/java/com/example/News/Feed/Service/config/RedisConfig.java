@@ -4,6 +4,7 @@ import com.example.News.Feed.Service.dto.VideoDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -20,10 +21,12 @@ import java.util.List;
 
 @Configuration
 public class RedisConfig {
+    @Value("${REDIS_HOST}")
+    private String redisIP;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory("redis-server", 6379);
+        return new LettuceConnectionFactory(redisIP, 6379);
     }
 
     private RedisCacheConfiguration defaultCacheConfig() {

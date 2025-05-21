@@ -22,6 +22,8 @@ spec:
     spec:
       containers:
         - env:
+            - name: NEWSFEED_SERVICE_URL
+              value: http://newsfeed-ms:8080/newsFeed
             - name: SPRING_DATASOURCE_PASSWORD
               value: "1234"
             - name: SPRING_DATASOURCE_URL

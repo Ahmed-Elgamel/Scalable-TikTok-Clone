@@ -127,6 +127,8 @@ services:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
       MINIO_ENDPOINT: http://minio:9000
+      NEWSFEED_SERVICE_URL: http://newsfeed-ms-container:8080/newsFeed
+      MONGO_URI: mongodb://root:example@mongo-container:27017/video_metadata_db?authSource=admin
     depends_on:
       minio:
         condition: service_started
@@ -157,6 +159,8 @@ services:
       - "8082:8080"
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      FOLLOW_SERVICE_URL: http://follow-ms-container:8080/api/follow
+      REDIS_HOST: redis-server
 #      SPRING_DATA_CASSANDRA_CONTACT_POINTS: cassandra
 #      SPRING_DATA_CASSANDRA_PORT: 9042
 #      SPRING_DATA_CASSANDRA_KEYSPACE_NAME: testKeySpace
@@ -193,6 +197,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/user
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 1234
+      NEWSFEED_SERVICE_URL: http://newsfeed-ms-container:8080/newsFeed
     ports:
       - "8083:8080"
   #######################################################################################################################################
@@ -236,9 +241,14 @@ services:
       - "8084:8080"
     networks:
       - eureka-network
-#    environment:
+    environment:
+      VIDEO_SERVICE_URL: http://video-ms-container:8080
+      USER_SERVICE_URL: http://user-ms-container:8080
+      FOLLOW_SERVICE_URL: http://follow-ms-container:8080
+      NEWSFEED_SERVICE_URL: http://newsfeed-ms-container:8080
 #      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
 #      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+
     depends_on:
       - eureka-server
       - user-ms
