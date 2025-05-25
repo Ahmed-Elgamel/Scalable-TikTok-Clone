@@ -23,7 +23,7 @@ spec:
       containers:
         - env:
             - name: FOLLOW_SERVICE_URL
-              value: http://follow-service:8080/api/follow
+              value: http://follow-service:8085/api/follow
             - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
               value: kafka:9092
             - name: REDIS_HOST
